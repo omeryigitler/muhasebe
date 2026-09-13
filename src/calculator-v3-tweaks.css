@@ -1,0 +1,73 @@
+/* Final calculator V3 refinements. Kept separate so the working calculator logic stays untouched. */
+
+/* Receipt: visually feed the paper into the slot instead of floating above the device. */
+.pc3-scene {
+  padding-top: 104px;
+}
+
+.pc3-receipt {
+  top: -64px;
+  width: 58%;
+  height: 146px;
+  z-index: 0;
+  border-radius: 5px 5px 0 0;
+  box-shadow:
+    0 8px 18px rgba(0,0,0,.16),
+    inset 0 1px rgba(255,255,255,.94);
+}
+
+.pc3-device {
+  z-index: 2;
+}
+
+.pc3-topdeck {
+  z-index: 5;
+}
+
+.pc3-slot {
+  z-index: 6;
+  height: 12px;
+  box-shadow:
+    inset 0 5px 8px rgba(0,0,0,.95),
+    0 1px rgba(255,255,255,.05),
+    0 -3px 8px rgba(0,0,0,.22);
+}
+
+.pc3-receipt::after {
+  height: 12px;
+  background: linear-gradient(180deg, transparent, rgba(0,0,0,.025));
+}
+
+/* Display: cleaner financial typography, less retro / neon. */
+.pc3-value {
+  font-family: var(--font-body);
+  font-weight: 650;
+  font-size: clamp(1.95rem, 5.4vw, 2.4rem);
+  letter-spacing: -.055em;
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+  text-shadow: 0 0 8px rgba(217,255,67,.12);
+}
+
+.pc3-display {
+  background:
+    radial-gradient(circle at 22% 0%, rgba(82,101,255,.025), transparent 48%),
+    linear-gradient(160deg, #050607, #0b0c0f 76%);
+}
+
+/* Remove the decorative vertical divider in the middle of the Hero only. */
+#top > .sticky > .absolute.inset-0.pointer-events-none.overflow-hidden > :nth-child(3) {
+  display: none !important;
+}
+
+@media (max-width: 639px) {
+  .pc3-scene {
+    padding-top: 80px;
+  }
+
+  .pc3-receipt {
+    top: -48px;
+    width: 62%;
+    height: 112px;
+  }
+}
