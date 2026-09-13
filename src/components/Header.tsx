@@ -260,7 +260,7 @@ export const Header = () => {
 
               <a
                 href="#contact"
-                className="inline-flex h-10 items-center rounded-full bg-electric-blue border border-[#FF90E8] px-5 font-mono text-[11px] uppercase tracking-[0.14em] text-white shadow-[4px_4px_0_#FF90E8] transition-[transform,box-shadow,background-color] duration-300 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_#FF90E8] active:translate-x-0 active:translate-y-[1px] active:shadow-[2px_2px_0_#FF90E8]"
+                className="inline-flex h-10 items-center rounded-full bg-electric-blue border border-acid-lime px-5 font-mono text-[11px] uppercase tracking-[0.14em] text-white shadow-[4px_4px_0_#D9FF43] transition-[transform,box-shadow,background-color] duration-300 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_#D9FF43] active:translate-x-0 active:translate-y-[1px] active:shadow-[2px_2px_0_#D9FF43]"
               >
                 {t('nav.talk')}
               </a>
@@ -338,7 +338,7 @@ export const Header = () => {
           href="#contact"
           tabIndex={isMenuOpen ? 0 : -1}
           onClick={() => setIsMenuOpen(false)}
-          className="mt-8 min-h-12 inline-flex items-center justify-center self-start bg-electric-blue text-white px-7 rounded-full border border-[#FF90E8] shadow-[4px_4px_0_#FF90E8] font-mono text-sm uppercase tracking-widest"
+          className="mt-8 min-h-12 inline-flex items-center justify-center self-start bg-electric-blue text-white px-7 rounded-full border border-acid-lime shadow-[4px_4px_0_#D9FF43] font-mono text-sm uppercase tracking-widest"
         >
           {t('nav.talk')} ›
         </a>
