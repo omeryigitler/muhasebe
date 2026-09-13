@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
+import React, { useEffect, useImperativeHandle, useRef, useState, forwardRef } from 'react';
 import { cn } from '../utils/cn';
 import { APP_CONFIG, getFinanceLocale } from '../config';
 import { useLanguage } from '../context/LanguageContext';
+import './CalculatorV3.css';
 
 export type CalculatorDemoPreset = 'bookkeeping' | 'vat' | 'payroll' | 'reporting';
 
@@ -39,8 +40,8 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
     const [error, setError] = useState<string | null>(null);
     const [keyboardActive, setKeyboardActive] = useState(false);
 
-    const receiptRef = useRef<HTMLDivElement>(null);
     const rootRef = useRef<HTMLDivElement>(null);
+    const receiptRef = useRef<HTMLDivElement>(null);
 
     const toDisplayValue = (num: number) => {
       if (!Number.isFinite(num)) return '0';
@@ -49,8 +50,8 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
     };
 
     const parseDisplay = () => {
-      const parsed = Number(display);
-      return Number.isFinite(parsed) ? parsed : 0;
+      const value = Number(display);
+      return Number.isFinite(value) ? value : 0;
     };
 
     const resetCore = () => {
@@ -63,12 +64,10 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
     };
 
     const addToReceipt = (kind: ReceiptEntryKind, amount: number, entryOperator?: string) => {
-      setReceipt((prev) => [...prev, {
-        id: Date.now() + Math.random(),
-        kind,
-        amount,
-        operator: entryOperator,
-      }]);
+      setReceipt((current) => [
+        ...current,
+        { id: Date.now() + Math.random(), kind, amount, operator: entryOperator },
+      ]);
     };
 
     const makeReceipt = (entries: Array<Omit<ReceiptEntry, 'id'>>) => {
@@ -142,28 +141,35 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
           { kind: 'operation', amount: 975, operator: '+' },
           { kind: 'total', amount: 5795 },
         ]));
-      } else if (preset === 'vat') {
+        return;
+      }
+
+      if (preset === 'vat') {
         setDisplay('6954');
         setReceipt(makeReceipt([
           { kind: 'entry', amount: 5795 },
           { kind: 'vat-add', amount: 1159 },
           { kind: 'total', amount: 6954 },
         ]));
-      } else if (preset === 'payroll') {
+        return;
+      }
+
+      if (preset === 'payroll') {
         setDisplay('42000');
         setReceipt(makeReceipt([
           { kind: 'entry', amount: 32500 },
           { kind: 'operation', amount: 9500, operator: '+' },
           { kind: 'total', amount: 42000 },
         ]));
-      } else {
-        setDisplay('14750');
-        setReceipt(makeReceipt([
-          { kind: 'entry', amount: 34200 },
-          { kind: 'operation', amount: 19450, operator: '−' },
-          { kind: 'total', amount: 14750 },
-        ]));
+        return;
       }
+
+      setDisplay('14750');
+      setReceipt(makeReceipt([
+        { kind: 'entry', amount: 34200 },
+        { kind: 'operation', amount: 19450, operator: '−' },
+        { kind: 'total', amount: 14750 },
+      ]));
     };
 
     const handlePress = (key: string, source: 'user' | 'simulation' = 'user') => {
@@ -211,8 +217,7 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
       }
 
       if (key === '⌫') {
-        if (waitingForNewValue) return;
-        setDisplay(display.length > 1 ? display.slice(0, -1) : '0');
+        if (!waitingForNewValue) setDisplay(display.length > 1 ? display.slice(0, -1) : '0');
         return;
       }
 
@@ -294,11 +299,11 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
       simulatePress: (key) => {
         setActiveKey(key);
         handlePress(key, 'simulation');
-        window.setTimeout(() => setActiveKey(null), 150);
+        window.setTimeout(() => setActiveKey(null), 140);
       },
-      setDisplay: (val) => {
+      setDisplay: (value) => {
         setError(null);
-        setDisplay(val);
+        setDisplay(value);
       },
       setDemo,
     }));
@@ -332,7 +337,7 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
           event.preventDefault();
           setActiveKey(mappedKey);
           handlePress(mappedKey, 'user');
-          window.setTimeout(() => setActiveKey(null), 150);
+          window.setTimeout(() => setActiveKey(null), 140);
         }
       };
 
@@ -340,19 +345,8 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
       return () => window.removeEventListener('keydown', handleKeyDown);
     }, [display, previousValue, operator, waitingForNewValue, error, language]);
 
-    const handleTilt = (event: React.PointerEvent<HTMLDivElement>) => {
-      if (event.pointerType === 'touch' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-      const rect = event.currentTarget.getBoundingClientRect();
-      const x = (event.clientX - rect.left) / rect.width - 0.5;
-      const y = (event.clientY - rect.top) / rect.height - 0.5;
-      event.currentTarget.style.setProperty('--tilt-x', `${(-y * 5 + 2.4).toFixed(2)}deg`);
-      event.currentTarget.style.setProperty('--tilt-y', `${(x * 7 - 4).toFixed(2)}deg`);
-    };
-
-    const resetTilt = (event: React.PointerEvent<HTMLDivElement>) => {
-      event.currentTarget.style.setProperty('--tilt-x', '2.4deg');
-      event.currentTarget.style.setProperty('--tilt-y', '-4deg');
-    };
+    const pressVisual = (key: string) => setActiveKey(key);
+    const releaseVisual = () => setActiveKey(null);
 
     const renderKey = (
       label: string,
@@ -364,14 +358,18 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
       <button
         type="button"
         aria-label={ariaLabel || label}
+        onPointerDown={() => pressVisual(actionKey)}
+        onPointerUp={releaseVisual}
+        onPointerCancel={releaseVisual}
+        onPointerLeave={releaseVisual}
         onClick={() => handlePress(actionKey, 'user')}
         className={cn(
-          'physical-key',
-          variant === 'operator' && 'physical-key-operator',
-          variant === 'accent' && 'physical-key-accent',
-          variant === 'equals' && 'physical-key-equals',
-          activeKey === actionKey && 'sim-active',
-          colSpan === 2 && 'col-span-2'
+          'pc3-key',
+          variant === 'operator' && 'pc3-key-operator',
+          variant === 'accent' && 'pc3-key-accent',
+          variant === 'equals' && 'pc3-key-equals',
+          activeKey === actionKey && 'is-pressed',
+          colSpan === 2 && 'pc3-key-wide'
         )}
       >
         {label}
@@ -389,82 +387,89 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
           const target = event.target as HTMLElement;
           if (!target.closest('button')) rootRef.current?.focus({ preventScroll: true });
         }}
-        onPointerMove={handleTilt}
-        onPointerLeave={resetTilt}
-        className={cn('native-cursor physical-calc-scene w-full max-w-[430px] mx-auto outline-none', className)}
+        className={cn('native-cursor pc3-scene w-full max-w-[430px] mx-auto outline-none', className)}
       >
-        <div className="physical-calc-glow" aria-hidden="true" />
+        <div className="pc3-ambient" aria-hidden="true" />
 
-        <div className="physical-calc-receipt" aria-hidden={receipt.length === 0 ? undefined : undefined}>
-          <div className="flex items-center justify-between pb-2 border-b border-deep-ink/12 text-[8px] sm:text-[9px] tracking-[0.18em] opacity-50">
-            <span>{language === 'tr' ? 'İşlem fişi' : 'Calculation tape'}</span>
-            <span>{finance.code}</span>
+        <div className="pc3-device">
+          <div className="pc3-receipt" aria-hidden="true">
+            <div className="pc3-receipt-head">
+              <span>{language === 'tr' ? 'İşlem fişi' : 'Calculation tape'}</span>
+              <span>{finance.code}</span>
+            </div>
+            <div ref={receiptRef} className="pc3-receipt-lines no-scrollbar">
+              {receipt.length === 0 ? (
+                <div className="pc3-receipt-line is-empty">
+                  <span>{language === 'tr' ? 'Hazır' : 'Ready'}</span>
+                  <span>{formatCurrency(0)}</span>
+                </div>
+              ) : receipt.map((entry) => (
+                <div key={entry.id} className={cn('pc3-receipt-line', entry.kind === 'total' && 'is-total')}>
+                  <span>{getReceiptLabel(entry)}</span>
+                  <span>{formatCurrency(entry.amount)}</span>
+                </div>
+              ))}
+            </div>
           </div>
-          <div ref={receiptRef} className="mt-auto overflow-y-auto no-scrollbar flex flex-col gap-1 w-full mask-image-bottom">
-            {receipt.length === 0 ? (
-              <div className="flex justify-between opacity-30"><span>—</span><span>{formatCurrency(0)}</span></div>
-            ) : receipt.map((entry) => (
-              <div key={entry.id} className={cn('flex justify-between gap-3 w-full', entry.kind === 'total' && 'border-t border-dashed border-deep-ink/30 pt-1 font-bold mt-1')}>
-                <span className="opacity-70 truncate">{getReceiptLabel(entry)}</span>
-                <span className="tabular-nums shrink-0">{formatCurrency(entry.amount)}</span>
-              </div>
-            ))}
+
+          <div className="pc3-topdeck" aria-hidden="true">
+            <div className="pc3-slot" />
           </div>
-        </div>
 
-        <div className="physical-calc-device">
-          <div className="physical-calc-slot" aria-hidden="true" />
-
-          <div className="physical-calc-brandrow">
+          <div className="pc3-brandrow">
             <div>
-              <p className="font-mono text-[9px] text-white/32 tracking-[0.18em] uppercase">Sayısal / Calc</p>
-              <p className="font-mono text-[8px] text-white/18 tracking-[0.12em] uppercase mt-0.5">{finance.code} · {APP_CONFIG.vatRate}% {t('calc.vat')}</p>
+              <p className="pc3-brand">SAYISAL / CALC</p>
+              <p className="pc3-meta">{finance.code} · {APP_CONFIG.vatRate}% {t('calc.vat')}</p>
             </div>
-            <div className="flex items-center gap-1.5" aria-hidden="true">
-              <span className="physical-led bg-coral" />
-              <span className="physical-led bg-acid-lime" />
+            <div className="pc3-status" aria-hidden="true">
+              <span className="pc3-statusdot pc3-statusdot-coral" />
+              <span className="pc3-statusdot pc3-statusdot-lime" />
             </div>
           </div>
 
-          <div className="physical-calc-console">
-            <div className={cn('physical-calc-display', error && 'is-error')}>
-              <div className="flex items-center justify-between min-h-5 mb-1 font-mono text-[8px] sm:text-[9px] uppercase tracking-[0.16em]">
-                <span className="text-white/18">{keyboardActive ? (language === 'tr' ? 'Klavye aktif' : 'Keyboard active') : (language === 'tr' ? 'Hazır' : 'Ready')}</span>
-                <span className="text-acid-lime/55">{operator || ''}</span>
+          <div className="pc3-console">
+            <div className={cn('pc3-display', error && 'is-error')}>
+              <div className="pc3-display-meta">
+                <span>{keyboardActive ? (language === 'tr' ? 'Klavye aktif' : 'Keyboard active') : (language === 'tr' ? 'Hazır' : 'Ready')}</span>
+                <span>{operator || ''}</span>
               </div>
-              <div
-                aria-live="polite"
-                aria-atomic="true"
-                className={cn('w-full text-right font-mono tracking-[-0.04em] tabular-nums truncate', error ? 'text-2xl text-coral' : 'text-[2rem] sm:text-[2.45rem] text-acid-lime')}
-              >
+              <div aria-live="polite" aria-atomic="true" className={cn('pc3-value', error && 'is-error')}>
                 {formatLiveDisplay(display)}
               </div>
             </div>
 
-            <div className="physical-knob-panel" aria-hidden="true">
-              <div className="physical-knob"><span /></div>
-              <span className="font-mono text-[7px] tracking-[0.2em] uppercase text-white/22">Mode</span>
+            <div className="pc3-knob-panel" aria-hidden="true">
+              <div className="pc3-knob" />
+              <span>MODE</span>
             </div>
           </div>
 
-          <div className="physical-calc-vat-row">
+          <div className="pc3-vat-row">
             <button
               type="button"
+              onPointerDown={() => pressVisual('VAT+')}
+              onPointerUp={releaseVisual}
+              onPointerCancel={releaseVisual}
+              onPointerLeave={releaseVisual}
               onClick={() => handlePress('VAT+', 'user')}
-              className={cn('physical-key physical-key-vat-plus', activeKey === 'VAT+' && 'sim-active')}
+              className={cn('pc3-key pc3-vat-plus', activeKey === 'VAT+' && 'is-pressed')}
             >
               <span>+</span><span>{t('calc.vat')}</span><span>{APP_CONFIG.vatRate}%</span>
             </button>
             <button
               type="button"
+              onPointerDown={() => pressVisual('VAT-')}
+              onPointerUp={releaseVisual}
+              onPointerCancel={releaseVisual}
+              onPointerLeave={releaseVisual}
               onClick={() => handlePress('VAT-', 'user')}
-              className={cn('physical-key physical-key-vat-minus', activeKey === 'VAT-' && 'sim-active')}
+              className={cn('pc3-key pc3-vat-minus', activeKey === 'VAT-' && 'is-pressed')}
             >
               <span>−</span><span>{t('calc.vat')}</span><span>{APP_CONFIG.vatRate}%</span>
             </button>
           </div>
 
-          <div className="physical-calc-keypad">
+          <div className="pc3-keypad">
             {renderKey('C', 1, 'accent', 'C', language === 'tr' ? 'Temizle' : 'Clear')}
             {renderKey('⌫', 1, 'default', '⌫', language === 'tr' ? 'Geri sil' : 'Backspace')}
             {renderKey('%', 1, 'operator')}
@@ -478,10 +483,10 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
             {renderKey('=', 1, 'equals')}
           </div>
 
-          <div className="physical-calc-footlight" aria-hidden="true" />
+          <div className="pc3-reflection" aria-hidden="true" />
         </div>
 
-        <p className="mt-4 text-center font-mono text-[8px] sm:text-[9px] uppercase tracking-[0.16em] text-white/24">
+        <p className="pc3-caption">
           {isInteractive
             ? (language === 'tr' ? 'Tıkla veya odakla · Klavye destekli' : 'Click or focus · Keyboard enabled')
             : (language === 'tr' ? 'Canlı demo çalışıyor' : 'Live demo running')}
