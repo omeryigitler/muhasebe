@@ -6,72 +6,16 @@ export const Stats = () => {
 
   const principles = language === 'tr'
     ? [
-        {
-          symbol: '+',
-          title: 'Netlik',
-          description: 'Rakamları karar verebileceğiniz bir dile çevir.',
-          layer: 'bg-acid-lime',
-          hoverText: 'group-hover:text-deep-ink',
-          hoverMuted: 'group-hover:text-deep-ink/60',
-        },
-        {
-          symbol: '−',
-          title: 'Sürpriz',
-          description: 'Son güne kalan belirsizliği süreçten çıkar.',
-          layer: 'bg-coral',
-          hoverText: 'group-hover:text-deep-ink',
-          hoverMuted: 'group-hover:text-deep-ink/60',
-        },
-        {
-          symbol: '=',
-          title: 'Düzen',
-          description: 'Belgeleri, kayıtları ve raporları tek akışta tut.',
-          layer: 'bg-electric-blue',
-          hoverText: 'group-hover:text-white',
-          hoverMuted: 'group-hover:text-white/65',
-        },
-        {
-          symbol: '→',
-          title: 'Aksiyon',
-          description: 'Raporu arşiv değil, bir sonraki karar için kullan.',
-          layer: 'bg-vivid-purple',
-          hoverText: 'group-hover:text-white',
-          hoverMuted: 'group-hover:text-white/65',
-        },
+        { symbol: '+', title: 'Netlik', description: 'Rakamları karar verebileceğiniz bir dile çevir.', layer: 'bg-acid-lime', hoverText: 'group-hover:text-deep-ink', hoverMuted: 'group-hover:text-deep-ink/60' },
+        { symbol: '−', title: 'Sürpriz', description: 'Son güne kalan belirsizliği süreçten çıkar.', layer: 'bg-coral', hoverText: 'group-hover:text-deep-ink', hoverMuted: 'group-hover:text-deep-ink/60' },
+        { symbol: '=', title: 'Düzen', description: 'Belgeleri, kayıtları ve raporları tek akışta tut.', layer: 'bg-electric-blue', hoverText: 'group-hover:text-white', hoverMuted: 'group-hover:text-white/65' },
+        { symbol: '→', title: 'Aksiyon', description: 'Raporu arşiv değil, bir sonraki karar için kullan.', layer: 'bg-vivid-purple', hoverText: 'group-hover:text-white', hoverMuted: 'group-hover:text-white/65' },
       ]
     : [
-        {
-          symbol: '+',
-          title: 'Clarity',
-          description: 'Turn numbers into information you can make a decision with.',
-          layer: 'bg-acid-lime',
-          hoverText: 'group-hover:text-deep-ink',
-          hoverMuted: 'group-hover:text-deep-ink/60',
-        },
-        {
-          symbol: '−',
-          title: 'Surprises',
-          description: 'Remove last-minute uncertainty from the process.',
-          layer: 'bg-coral',
-          hoverText: 'group-hover:text-deep-ink',
-          hoverMuted: 'group-hover:text-deep-ink/60',
-        },
-        {
-          symbol: '=',
-          title: 'Order',
-          description: 'Keep documents, entries, and reporting in one clean flow.',
-          layer: 'bg-electric-blue',
-          hoverText: 'group-hover:text-white',
-          hoverMuted: 'group-hover:text-white/65',
-        },
-        {
-          symbol: '→',
-          title: 'Action',
-          description: 'Use reporting for the next decision, not just the archive.',
-          layer: 'bg-vivid-purple',
-          hoverText: 'group-hover:text-white',
-          hoverMuted: 'group-hover:text-white/65',
-        },
+        { symbol: '+', title: 'Clarity', description: 'Turn numbers into information you can make a decision with.', layer: 'bg-acid-lime', hoverText: 'group-hover:text-deep-ink', hoverMuted: 'group-hover:text-deep-ink/60' },
+        { symbol: '−', title: 'Surprises', description: 'Remove last-minute uncertainty from the process.', layer: 'bg-coral', hoverText: 'group-hover:text-deep-ink', hoverMuted: 'group-hover:text-deep-ink/60' },
+        { symbol: '=', title: 'Order', description: 'Keep documents, entries, and reporting in one clean flow.', layer: 'bg-electric-blue', hoverText: 'group-hover:text-white', hoverMuted: 'group-hover:text-white/65' },
+        { symbol: '→', title: 'Action', description: 'Use reporting for the next decision, not just the archive.', layer: 'bg-vivid-purple', hoverText: 'group-hover:text-white', hoverMuted: 'group-hover:text-white/65' },
       ];
 
   return (
@@ -83,13 +27,10 @@ export const Stats = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-t border-l border-white/10">
           {principles.map((item, index) => (
-            <article
-              key={item.title}
-              className="group relative min-h-[270px] p-7 md:p-8 border-r border-b border-white/10 flex flex-col justify-between overflow-hidden isolate"
-            >
-              <div className={`absolute inset-0 ${item.layer} translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(.2,.8,.2,1)] -z-10`} />
+            <article key={item.title} className="group relative min-h-[270px] p-7 md:p-8 border-r border-b border-white/10 flex flex-col justify-between overflow-hidden isolate">
+              <div className={`absolute inset-0 z-0 ${item.layer} translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(.2,.8,.2,1)]`} />
 
-              <div className="flex items-start justify-between gap-4">
+              <div className="relative z-10 flex items-start justify-between gap-4">
                 <span className={`font-display text-7xl md:text-8xl leading-none text-acid-lime transition-[transform,color] duration-500 group-hover:scale-110 group-hover:rotate-[4deg] origin-left ${item.hoverText}`}>
                   {item.symbol}
                 </span>
@@ -98,7 +39,7 @@ export const Stats = () => {
                 </span>
               </div>
 
-              <div className={`transition-colors duration-300 ${item.hoverText}`}>
+              <div className={`relative z-10 transition-colors duration-300 ${item.hoverText}`}>
                 <h3 className="font-display text-3xl md:text-[2rem] mb-3 tracking-tight">{item.title}</h3>
                 <p className={`text-sm md:text-base text-white/45 leading-relaxed transition-colors duration-300 ${item.hoverMuted}`}>
                   {item.description}
