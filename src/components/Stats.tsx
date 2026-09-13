@@ -9,13 +9,13 @@ export const Stats = () => {
         { symbol: '+', title: 'Netlik', description: 'Rakamları karar verebileceğiniz bir dile çevir.', layer: 'bg-electric-blue', hoverText: 'group-hover:text-white', hoverMuted: 'group-hover:text-white/65' },
         { symbol: '−', title: 'Sürpriz', description: 'Son güne kalan belirsizliği süreçten çıkar.', layer: 'bg-acid-lime', hoverText: 'group-hover:text-deep-ink', hoverMuted: 'group-hover:text-deep-ink/60' },
         { symbol: '=', title: 'Düzen', description: 'Belgeleri, kayıtları ve raporları tek akışta tut.', layer: 'bg-coral', hoverText: 'group-hover:text-deep-ink', hoverMuted: 'group-hover:text-deep-ink/60' },
-        { symbol: '→', title: 'Aksiyon', description: 'Raporu arşiv değil, bir sonraki karar için kullan.', layer: 'bg-[#FF90E8]', hoverText: 'group-hover:text-deep-ink', hoverMuted: 'group-hover:text-deep-ink/60' },
+        { symbol: '›', title: 'Aksiyon', description: 'Raporu arşiv değil, bir sonraki karar için kullan.', layer: 'bg-[#FF90E8]', hoverText: 'group-hover:text-deep-ink', hoverMuted: 'group-hover:text-deep-ink/60' },
       ]
     : [
         { symbol: '+', title: 'Clarity', description: 'Turn numbers into information you can make a decision with.', layer: 'bg-electric-blue', hoverText: 'group-hover:text-white', hoverMuted: 'group-hover:text-white/65' },
         { symbol: '−', title: 'Surprises', description: 'Remove last-minute uncertainty from the process.', layer: 'bg-acid-lime', hoverText: 'group-hover:text-deep-ink', hoverMuted: 'group-hover:text-deep-ink/60' },
         { symbol: '=', title: 'Order', description: 'Keep documents, entries, and reporting in one clean flow.', layer: 'bg-coral', hoverText: 'group-hover:text-deep-ink', hoverMuted: 'group-hover:text-deep-ink/60' },
-        { symbol: '→', title: 'Action', description: 'Use reporting for the next decision, not just the archive.', layer: 'bg-[#FF90E8]', hoverText: 'group-hover:text-deep-ink', hoverMuted: 'group-hover:text-deep-ink/60' },
+        { symbol: '›', title: 'Action', description: 'Use reporting for the next decision, not just the archive.', layer: 'bg-[#FF90E8]', hoverText: 'group-hover:text-deep-ink', hoverMuted: 'group-hover:text-deep-ink/60' },
       ];
 
   return (
@@ -31,7 +31,7 @@ export const Stats = () => {
               <div className={`absolute inset-0 z-0 ${item.layer} translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(.2,.8,.2,1)]`} />
 
               <div className="relative z-10 flex items-start justify-between gap-4">
-                <span className={`font-display text-7xl md:text-8xl leading-none text-acid-lime transition-[transform,color] duration-500 group-hover:scale-110 group-hover:rotate-[4deg] origin-left ${item.hoverText}`}>
+                <span className={`font-display font-bold text-7xl md:text-8xl leading-none text-acid-lime transition-[transform,color] duration-500 group-hover:scale-110 group-hover:rotate-[4deg] origin-left ${item.hoverText}`}>
                   {item.symbol}
                 </span>
                 <span className={`font-mono text-[9px] tracking-[0.24em] text-white/25 transition-colors duration-300 ${item.hoverMuted}`}>
