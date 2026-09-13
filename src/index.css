@@ -2,11 +2,21 @@
 
 @font-face {
   font-family: "Sayisal Display";
+  src: url("https://raw.githubusercontent.com/google/fonts/main/ofl/baloo2/Baloo2%5Bwght%5D.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  size-adjust: 94%;
+  unicode-range: U+015E-015F;
+}
+
+@font-face {
+  font-family: "Sayisal Display";
   src: url("https://raw.githubusercontent.com/google/fonts/main/ofl/nunito/Nunito%5Bwght%5D.ttf") format("truetype");
   font-style: normal;
   font-weight: 200 1000;
   font-display: swap;
-  unicode-range: U+00C7, U+00D6, U+00DC, U+00E7, U+00F6, U+00FC, U+011E-011F, U+0130-0131, U+015E-015F;
+  unicode-range: U+00C7, U+00D6, U+00DC, U+00E7, U+00F6, U+00FC, U+011E-011F, U+0130-0131;
 }
 
 @font-face {
