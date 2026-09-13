@@ -39,7 +39,7 @@ export const Services = () => {
     'bg-[#00E5FF] text-deep-ink',
   ];
 
-  const symbols = ['+', '%', finance.symbol, '→', '=', '?'];
+  const symbols = ['+', '%', finance.symbol, '›', '=', '?'];
   const hoverText = ['group-hover:text-white', 'group-hover:text-deep-ink', 'group-hover:text-deep-ink', 'group-hover:text-white', 'group-hover:text-deep-ink', 'group-hover:text-deep-ink'];
 
   const services = Array.from({ length: 6 }, (_, index) => ({
@@ -93,7 +93,7 @@ export const Services = () => {
                 <h3 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-none tracking-tight">{service.title}</h3>
                 <p className="hidden md:block text-sm lg:text-base leading-relaxed max-w-md opacity-55 group-hover:opacity-80 transition-opacity">{service.description}</p>
                 <div className="justify-self-end overflow-hidden w-12 h-12 md:w-16 md:h-16 flex items-center justify-center">
-                  <span className="font-display text-5xl md:text-7xl leading-none transition-transform duration-500 group-hover:rotate-12 group-hover:scale-125">{service.symbol}</span>
+                  <span className="font-display font-bold text-5xl md:text-7xl leading-none transition-transform duration-500 group-hover:rotate-12 group-hover:scale-125">{service.symbol}</span>
                 </div>
               </div>
 
