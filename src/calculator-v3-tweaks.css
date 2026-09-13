@@ -1,22 +1,50 @@
 /* Final calculator V3 refinements. Kept separate so the working calculator logic stays untouched. */
 
-/* Receipt: the deck sits behind the paper, while the slot itself sits over it. */
+/* Receipt: physical thermal paper emerging from the printer slot. */
 .pc3-scene {
   padding-top: 104px;
 }
 
 .pc3-receipt {
-  /* The lower edge reaches into the slot instead of stopping at the chassis edge. */
+  /* Bottom edge sits inside the slot; the paper itself remains one continuous sheet. */
   top: -96px;
-  width: 56%;
+  width: 56.5%;
   height: 116px;
   z-index: 5;
   padding: 13px 15px 15px;
-  border-radius: 5px 5px 0 0;
-  border-color: rgba(16,17,20,.07);
+  border-radius: 3px 3px 0 0;
+  border-color: rgba(16,17,20,.065);
+  transform: translateX(-50%) rotateZ(-0.32deg) rotateX(-1.4deg);
+  transform-origin: 50% 100%;
+  backface-visibility: hidden;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.52), transparent 15%),
+    repeating-linear-gradient(0deg, transparent 0 18px, rgba(16,17,20,.018) 19px),
+    linear-gradient(90deg, rgba(0,0,0,.028), transparent 9%, transparent 91%, rgba(0,0,0,.022)),
+    #f7f2e8;
   box-shadow:
-    0 7px 16px rgba(0,0,0,.15),
-    inset 0 1px rgba(255,255,255,.94);
+    0 10px 20px -12px rgba(0,0,0,.52),
+    0 2px 4px rgba(0,0,0,.08),
+    inset 0 1px rgba(255,255,255,.96),
+    inset 0 -8px 14px -14px rgba(16,17,20,.32);
+}
+
+.pc3-receipt::before {
+  content: "";
+  position: absolute;
+  left: 7%;
+  right: 5%;
+  top: 0;
+  height: 13px;
+  pointer-events: none;
+  border-radius: 50%;
+  background: linear-gradient(180deg, rgba(255,255,255,.36), transparent);
+  opacity: .58;
+}
+
+.pc3-receipt::after {
+  height: 9px;
+  background: linear-gradient(180deg, transparent, rgba(0,0,0,.026));
 }
 
 .pc3-receipt-head {
@@ -29,32 +57,58 @@
   font-size: 8.5px;
 }
 
+.pc3-receipt-line {
+  animation: pc3-print-line 220ms cubic-bezier(.22,.78,.32,1) both;
+}
+
 .pc3-receipt-line.is-total {
   padding-top: 4px;
+}
+
+@keyframes pc3-print-line {
+  from {
+    opacity: .25;
+    transform: translateY(3px);
+    filter: blur(.25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
 }
 
 .pc3-device {
   z-index: 2;
 }
 
-/* Do not create a stacking context here; the paper must be visible over the deck. */
+/* Deck behind the paper; only the actual feed slot sits above it. */
 .pc3-topdeck {
   z-index: auto;
 }
 
-/* The slot remains above the paper, creating the physical feed illusion. */
 .pc3-slot {
   z-index: 6;
+  width: 59%;
   height: 12px;
+  overflow: visible;
   box-shadow:
     inset 0 5px 8px rgba(0,0,0,.95),
     0 1px rgba(255,255,255,.05),
     0 -3px 8px rgba(0,0,0,.22);
 }
 
-.pc3-receipt::after {
-  height: 8px;
-  background: linear-gradient(180deg, transparent, rgba(0,0,0,.02));
+.pc3-slot::before {
+  content: "";
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  top: -8px;
+  height: 10px;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent, rgba(0,0,0,.20));
+  filter: blur(2.2px);
+  opacity: .9;
 }
 
 /* Display: cleaner financial typography, less retro / neon. */
@@ -89,10 +143,21 @@
     width: 60%;
     height: 96px;
     padding: 10px 11px 12px;
+    transform: translateX(-50%) rotateZ(-0.25deg);
   }
 
   .pc3-receipt-lines {
     height: 51px;
     font-size: 7.5px;
+  }
+
+  .pc3-slot {
+    width: 63%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pc3-receipt-line {
+    animation: none;
   }
 }
