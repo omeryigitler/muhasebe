@@ -1,16 +1,16 @@
 /* Final calculator V3 refinements. Kept separate so the working calculator logic stays untouched. */
 
-/* Receipt: one continuous sheet that terminates inside the printer slot. */
+/* Receipt: the deck sits behind the paper, while the slot itself sits over it. */
 .pc3-scene {
   padding-top: 104px;
 }
 
 .pc3-receipt {
-  /* 116px paper + -101px top = 15px bottom edge, right inside the slot. */
-  top: -101px;
+  /* The lower edge reaches into the slot instead of stopping at the chassis edge. */
+  top: -96px;
   width: 56%;
   height: 116px;
-  z-index: 0;
+  z-index: 5;
   padding: 13px 15px 15px;
   border-radius: 5px 5px 0 0;
   border-color: rgba(16,17,20,.07);
@@ -37,10 +37,12 @@
   z-index: 2;
 }
 
+/* Do not create a stacking context here; the paper must be visible over the deck. */
 .pc3-topdeck {
-  z-index: 5;
+  z-index: auto;
 }
 
+/* The slot remains above the paper, creating the physical feed illusion. */
 .pc3-slot {
   z-index: 6;
   height: 12px;
@@ -83,8 +85,7 @@
   }
 
   .pc3-receipt {
-    /* 96px paper + -81px top = same 15px slot insertion. */
-    top: -81px;
+    top: -76px;
     width: 60%;
     height: 96px;
     padding: 10px 11px 12px;
