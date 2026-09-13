@@ -18,10 +18,42 @@ export const Header = () => {
   const firstMobileLinkRef = useRef<HTMLAnchorElement>(null);
 
   const navLinks = [
-    { id: 'services' as const, href: '#services', label: t('nav.services'), index: '01' },
-    { id: 'tools' as const, href: '#tools', label: t('nav.tools'), index: '02' },
-    { id: 'process' as const, href: '#process', label: t('nav.process'), index: '03' },
-    { id: 'contact' as const, href: '#contact', label: t('nav.contact'), index: '04' },
+    {
+      id: 'services' as const,
+      href: '#services',
+      label: t('nav.services'),
+      index: '01',
+      bgAccent: 'bg-electric-blue',
+      textAccent: 'text-electric-blue',
+      hoverAccent: 'group-hover:text-electric-blue',
+    },
+    {
+      id: 'tools' as const,
+      href: '#tools',
+      label: t('nav.tools'),
+      index: '02',
+      bgAccent: 'bg-acid-lime',
+      textAccent: 'text-acid-lime',
+      hoverAccent: 'group-hover:text-acid-lime',
+    },
+    {
+      id: 'process' as const,
+      href: '#process',
+      label: t('nav.process'),
+      index: '03',
+      bgAccent: 'bg-coral',
+      textAccent: 'text-coral',
+      hoverAccent: 'group-hover:text-coral',
+    },
+    {
+      id: 'contact' as const,
+      href: '#contact',
+      label: t('nav.contact'),
+      index: '04',
+      bgAccent: 'bg-[#FF90E8]',
+      textAccent: 'text-[#FF90E8]',
+      hoverAccent: 'group-hover:text-[#FF90E8]',
+    },
   ];
 
   useEffect(() => {
@@ -187,12 +219,18 @@ export const Header = () => {
                       active ? 'text-white' : 'text-white/58 hover:text-white'
                     )}
                   >
-                    <span className="mr-1.5 text-[8px] text-white/25 group-hover:text-acid-lime/70 transition-colors">{link.index}</span>
+                    <span className={cn(
+                      'mr-1.5 text-[8px] transition-colors',
+                      active ? link.textAccent : `text-white/25 ${link.hoverAccent}`
+                    )}>
+                      {link.index}
+                    </span>
                     {link.label}
                     <span
                       className={cn(
                         'absolute left-0 right-0 -bottom-0.5 h-[2px] rounded-full origin-left transition-transform duration-300',
-                        active ? 'scale-x-100 bg-acid-lime' : 'scale-x-0 bg-acid-lime group-hover:scale-x-100'
+                        link.bgAccent,
+                        active ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
                       )}
                     />
                   </a>
@@ -222,7 +260,7 @@ export const Header = () => {
 
               <a
                 href="#contact"
-                className="inline-flex h-10 items-center rounded-full border border-white/20 px-5 font-mono text-[11px] uppercase tracking-[0.14em] text-white hover:bg-acid-lime hover:text-deep-ink hover:border-acid-lime transition-colors"
+                className="inline-flex h-10 items-center rounded-full bg-electric-blue border border-[#FF90E8] px-5 font-mono text-[11px] uppercase tracking-[0.14em] text-white shadow-[4px_4px_0_#FF90E8] transition-[transform,box-shadow,background-color] duration-300 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_#FF90E8] active:translate-x-0 active:translate-y-[1px] active:shadow-[2px_2px_0_#FF90E8]"
               >
                 {t('nav.talk')}
               </a>
@@ -288,10 +326,10 @@ export const Header = () => {
               className="group flex items-center justify-between gap-5 py-5 border-b border-white/10 text-warm-paper"
             >
               <span className="flex items-baseline gap-4 min-w-0">
-                <span className="font-mono text-[10px] text-white/28">{link.index}</span>
-                <span className="font-display text-4xl min-[390px]:text-5xl leading-none group-hover:text-acid-lime transition-colors truncate">{link.label}</span>
+                <span className={cn('font-mono text-[10px] transition-colors', activeSection === link.id ? link.textAccent : `text-white/28 ${link.hoverAccent}`)}>{link.index}</span>
+                <span className={cn('font-display text-4xl min-[390px]:text-5xl leading-none transition-colors truncate', link.hoverAccent)}>{link.label}</span>
               </span>
-              <span className={cn('font-display text-4xl leading-none', activeSection === link.id ? 'text-acid-lime' : 'text-white/20')}>›</span>
+              <span className={cn('font-display text-4xl leading-none transition-colors', activeSection === link.id ? link.textAccent : `text-white/20 ${link.hoverAccent}`)}>›</span>
             </a>
           ))}
         </nav>
@@ -300,7 +338,7 @@ export const Header = () => {
           href="#contact"
           tabIndex={isMenuOpen ? 0 : -1}
           onClick={() => setIsMenuOpen(false)}
-          className="mt-8 min-h-12 inline-flex items-center justify-center self-start bg-acid-lime text-deep-ink px-7 rounded-full font-mono text-sm uppercase tracking-widest"
+          className="mt-8 min-h-12 inline-flex items-center justify-center self-start bg-electric-blue text-white px-7 rounded-full border border-[#FF90E8] shadow-[4px_4px_0_#FF90E8] font-mono text-sm uppercase tracking-widest"
         >
           {t('nav.talk')} ›
         </a>
