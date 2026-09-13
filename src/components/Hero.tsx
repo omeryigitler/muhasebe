@@ -15,6 +15,7 @@ export const Hero = () => {
   const { t, language } = useLanguage();
   const finance = getFinanceLocale(language);
   const container = useRef<HTMLElement>(null);
+  const calcStageRef = useRef<HTMLDivElement>(null);
   const calcWrapperRef = useRef<HTMLDivElement>(null);
   const calcRef = useRef<CalculatorHandle>(null);
   const heroCopyRef = useRef<HTMLDivElement>(null);
@@ -64,7 +65,8 @@ export const Hero = () => {
     const isMobile = window.innerWidth < 768;
     const isDesktop = window.innerWidth > 1024;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const mobileFinalScale = 0.78;
+    const mobileFinalScale = 0.72;
+    const mobileFinalY = '-18svh';
     let startX = 0;
 
     if (isDesktop && calcWrapperRef.current) {
@@ -79,6 +81,7 @@ export const Hero = () => {
     const storySymbols = gsap.utils.toArray<HTMLElement>('.story-symbol');
 
     if (reduceMotion) {
+      gsap.set(calcStageRef.current, { y: isMobile ? mobileFinalY : 0 });
       gsap.set(calcWrapperRef.current, {
         x: 0,
         y: 0,
@@ -102,19 +105,30 @@ export const Hero = () => {
       };
     }
 
+    gsap.set(calcStageRef.current, { y: 0 });
     gsap.set(calcWrapperRef.current, {
-      scale: isMobile ? 0.92 : 0.8,
-      rotationY: isMobile ? 7 : 15,
-      rotationX: isMobile ? 5 : 10,
-      y: isMobile ? 8 : 50,
+      scale: isMobile ? 0.94 : 0.8,
+      rotationY: isMobile ? 6 : 15,
+      rotationX: isMobile ? 4 : 10,
+      y: isMobile ? 6 : 50,
       x: startX,
       opacity: 0,
     });
-    gsap.set(heroCopyRef.current, { autoAlpha: isMobile ? 0 : 1 });
-    gsap.set(headlineChildren, { y: isMobile ? 42 : 100, opacity: 0 });
-    gsap.set(subtextRef.current, { y: 20, opacity: 0 });
-    gsap.set(eyebrowRef.current, { y: 18, opacity: 0 });
-    gsap.set(actionsRef.current, { y: 18, opacity: 0 });
+
+    if (isMobile) {
+      gsap.set(heroCopyRef.current, { autoAlpha: 0, y: 24 });
+      gsap.set(headlineChildren, { y: 0, opacity: 1 });
+      gsap.set(subtextRef.current, { y: 0, opacity: 1 });
+      gsap.set(eyebrowRef.current, { y: 0, opacity: 1 });
+      gsap.set(actionsRef.current, { y: 0, opacity: 1 });
+    } else {
+      gsap.set(heroCopyRef.current, { autoAlpha: 1, y: 0 });
+      gsap.set(headlineChildren, { y: 100, opacity: 0 });
+      gsap.set(subtextRef.current, { y: 20, opacity: 0 });
+      gsap.set(eyebrowRef.current, { y: 18, opacity: 0 });
+      gsap.set(actionsRef.current, { y: 18, opacity: 0 });
+    }
+
     gsap.set(storyPanels, { autoAlpha: 0, y: 40 });
     gsap.set(storySymbols, { autoAlpha: 0, scale: 0.6, rotation: -16 });
 
@@ -122,6 +136,7 @@ export const Hero = () => {
       const intro = introTimelineRef.current;
       if (!intro || intro.progress() >= 1) return;
       intro.kill();
+      gsap.set(calcStageRef.current, { y: isMobile ? mobileFinalY : 0 });
       gsap.set(calcWrapperRef.current, {
         x: 0,
         y: 0,
@@ -145,8 +160,8 @@ export const Hero = () => {
 
     intro.to(calcWrapperRef.current, {
       scale: isMobile ? 1.02 : 1.08,
-      rotationY: isMobile ? 3 : 5,
-      rotationX: isMobile ? 3 : 5,
+      rotationY: isMobile ? 2 : 5,
+      rotationX: isMobile ? 2 : 5,
       y: 0,
       opacity: 1,
       duration: 1.2,
@@ -169,19 +184,25 @@ export const Hero = () => {
     });
 
     if (isMobile) {
+      intro.to(calcStageRef.current, {
+        y: mobileFinalY,
+        duration: 0.95,
+        ease: 'power3.inOut',
+      }, 3.72);
       intro.to(calcWrapperRef.current, {
         scale: mobileFinalScale,
         rotationY: 0,
         rotationX: 0,
-        y: -4,
+        y: 0,
         duration: 0.95,
         ease: 'power3.inOut',
-      }, 3.85);
-      intro.to(heroCopyRef.current, { autoAlpha: 1, y: 0, duration: 0.2 }, 4.05);
-      intro.to(headlineChildren, { y: 0, opacity: 1, stagger: 0.08, duration: 0.62, ease: 'back.out(1.45)' }, 4.08);
-      intro.to(eyebrowRef.current, { y: 0, opacity: 1, duration: 0.35, ease: 'power2.out' }, 4.18);
-      intro.to(subtextRef.current, { y: 0, opacity: 1, duration: 0.4, ease: 'power2.out' }, 4.35);
-      intro.to(actionsRef.current, { y: 0, opacity: 1, duration: 0.42, ease: 'power2.out' }, 4.52);
+      }, 3.72);
+      intro.to(heroCopyRef.current, {
+        autoAlpha: 1,
+        y: 0,
+        duration: 0.62,
+        ease: 'power2.out',
+      }, 4.05);
 
       return () => {
         finishIntroRef.current = () => undefined;
@@ -250,9 +271,9 @@ export const Hero = () => {
           <div className="absolute left-1/2 top-0 h-full w-px bg-gradient-to-b from-transparent via-white/10 to-transparent hidden lg:block" />
         </div>
 
-        <div className="max-w-7xl h-full md:h-auto w-full mx-auto grid grid-cols-1 grid-rows-[46%_54%] md:grid-rows-none lg:grid-cols-2 gap-0 md:gap-4 lg:gap-16 items-stretch md:items-center relative z-10">
-          <div className="relative min-h-0 h-full md:h-auto md:min-h-[330px] lg:min-h-[560px] order-2 lg:order-1 lg:pr-8">
-            <div ref={heroCopyRef} className="absolute inset-0 flex flex-col justify-start md:justify-center pt-2 md:pt-0 gap-2.5 sm:gap-5 lg:gap-6">
+        <div className="max-w-7xl h-full md:h-auto w-full mx-auto relative md:grid md:grid-cols-1 lg:grid-cols-2 md:gap-4 lg:gap-16 md:items-center z-10">
+          <div className="absolute left-0 right-0 bottom-0 h-[45%] md:relative md:h-auto md:min-h-[330px] lg:min-h-[560px] md:order-1 lg:pr-8 z-20">
+            <div ref={heroCopyRef} className="absolute inset-0 flex flex-col justify-start md:justify-center pt-1 md:pt-0 gap-2.5 sm:gap-5 lg:gap-6">
               <div className="text-[9px] sm:text-xs font-mono tracking-widest text-acid-lime uppercase overflow-hidden">
                 <span ref={eyebrowRef} className="block">{t('hero.eyebrow')}</span>
               </div>
@@ -293,8 +314,8 @@ export const Hero = () => {
             ))}
           </div>
 
-          <div className="order-1 lg:order-2 h-full md:h-auto flex items-center justify-center lg:justify-end perspective-1000 px-0 md:px-2 lg:pl-4 lg:pr-8">
-            <div ref={calcWrapperRef} className="w-full max-w-[300px] sm:max-w-[285px] lg:max-w-[320px] will-change-transform origin-center">
+          <div ref={calcStageRef} className="absolute inset-0 flex items-center justify-center pointer-events-none md:relative md:inset-auto md:h-auto md:order-2 lg:justify-end perspective-1000 md:px-2 lg:pl-4 lg:pr-8 z-10">
+            <div ref={calcWrapperRef} className="pointer-events-auto w-full max-w-[300px] sm:max-w-[285px] lg:max-w-[320px] will-change-transform origin-center">
               <Calculator ref={calcRef} isInteractive={isInteractive} onInteract={takeControl} />
               <div className="mt-2 sm:mt-4 flex items-center justify-center gap-2 sm:gap-3 font-mono text-[8px] sm:text-[10px] uppercase tracking-[0.18em] sm:tracking-[0.22em] text-white/30">
                 <span>{isInteractive ? storyCopy.calculatorReady : storyCopy.calculatorRunning}</span>
