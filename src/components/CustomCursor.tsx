@@ -8,6 +8,7 @@ export const CustomCursor = () => {
   const [isHovered, setIsHovered] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [enabled, setEnabled] = useState(false);
+  const [isNativeZone, setIsNativeZone] = useState(false);
 
   const cursorSize = isHovered ? 80 : 16;
   const mouseX = useMotionValue(-100);
@@ -19,7 +20,7 @@ export const CustomCursor = () => {
   useEffect(() => {
     const finePointer = window.matchMedia('(pointer: fine)').matches;
     if (!finePointer || reduceMotion) {
-      document.body.classList.remove('hide-cursor');
+      document.body.classList.remove('hide-cursor', 'show-native-cursor');
       setEnabled(false);
       return;
     }
@@ -35,7 +36,10 @@ export const CustomCursor = () => {
 
     const handleMouseOver = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-      setIsHovered(Boolean(target.closest('button, a, input, textarea, select, .interactive')));
+      const nativeZone = Boolean(target.closest('input, textarea, select, [contenteditable="true"], .native-cursor'));
+      setIsNativeZone(nativeZone);
+      document.body.classList.toggle('show-native-cursor', nativeZone);
+      setIsHovered(!nativeZone && Boolean(target.closest('button, a, .interactive')));
     };
 
     const handleMouseLeave = () => setIsVisible(false);
@@ -48,11 +52,11 @@ export const CustomCursor = () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseover', handleMouseOver);
       document.documentElement.removeEventListener('mouseleave', handleMouseLeave);
-      document.body.classList.remove('hide-cursor');
+      document.body.classList.remove('hide-cursor', 'show-native-cursor');
     };
   }, [mouseX, mouseY, reduceMotion]);
 
-  if (!enabled || !isVisible) return null;
+  if (!enabled || !isVisible || isNativeZone) return null;
 
   return (
     <motion.div
