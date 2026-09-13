@@ -10,6 +10,7 @@ const dictionaries: Record<Language, Dictionary> = {
   tr: {
     'nav.services': 'Hizmetler',
     'nav.tools': 'Araçlar',
+    'nav.process': 'Süreç',
     'nav.contact': 'İletişim',
     'nav.talk': 'Tanışalım',
     'nav.menu': 'Menü',
@@ -18,7 +19,7 @@ const dictionaries: Record<Language, Dictionary> = {
     'hero.t2': 'Sıkıcı Olmak',
     'hero.t3': 'Zorunda Değil.',
     'hero.desc': 'Muhasebe, vergi ve finansal süreçleri karmaşadan çıkarıp anlaşılır bir sisteme dönüştürüyoruz.',
-    'hero.cta1': 'Tanışalım \u2192',
+    'hero.cta1': 'Tanışalım ›',
     'hero.cta2': 'Hizmetleri Gör',
     'services.title': 'Sayıların arkasındaki işleri biz hallediyoruz.',
     'services.01': 'Muhasebe',
@@ -85,6 +86,7 @@ const dictionaries: Record<Language, Dictionary> = {
   en: {
     'nav.services': 'Services',
     'nav.tools': 'Tools',
+    'nav.process': 'Process',
     'nav.contact': 'Contact',
     'nav.talk': "Let's Talk",
     'nav.menu': 'Menu',
@@ -93,7 +95,7 @@ const dictionaries: Record<Language, Dictionary> = {
     'hero.t2': "Don't Have To Be",
     'hero.t3': 'Boring.',
     'hero.desc': 'We transform accounting, tax, and financial processes from chaos into a clear system.',
-    'hero.cta1': "Let's meet \u2192",
+    'hero.cta1': "Let's meet ›",
     'hero.cta2': 'View Services',
     'services.title': 'We handle the work behind the numbers.',
     'services.01': 'Bookkeeping',
