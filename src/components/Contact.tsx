@@ -74,7 +74,7 @@ export const Contact = () => {
 
           <button
             type="submit"
-            className="w-full bg-electric-blue text-white py-4 rounded-xl font-bold hover:-translate-y-1 hover:shadow-[4px_4px_0px_#D9FF43] border-2 border-transparent hover:border-acid-lime transition-all duration-300 uppercase tracking-widest mt-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-acid-lime focus-visible:ring-offset-4 focus-visible:ring-offset-deep-ink"
+            className="w-full bg-electric-blue text-white py-4 rounded-xl font-bold border-2 border-acid-lime/70 shadow-[0_6px_0_#D9FF43] hover:-translate-y-1 hover:bg-[#6170ff] hover:border-coral hover:shadow-[0_8px_0_#FF6654] active:translate-y-[3px] active:shadow-[0_3px_0_#D9FF43] transition-all duration-300 uppercase tracking-widest mt-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-acid-lime focus-visible:ring-offset-4 focus-visible:ring-offset-deep-ink"
           >
             {copy.submit}
           </button>
