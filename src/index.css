@@ -97,6 +97,345 @@ html[lang="en"] .font-display {
   box-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 -1px 2px rgba(0,0,0,0.4) inset;
 }
 
+/* Physical 2.5D calculator prototype — no image/WebGL dependency. */
+.physical-calc-scene {
+  --tilt-x: 2.4deg;
+  --tilt-y: -4deg;
+  position: relative;
+  perspective: 1500px;
+  padding-top: 92px;
+  transform-style: preserve-3d;
+}
+
+.physical-calc-glow {
+  position: absolute;
+  z-index: 0;
+  inset: 12% -18% -14%;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 12% 62%, rgba(82,101,255,.34), transparent 34%),
+    radial-gradient(circle at 88% 30%, rgba(255,102,84,.28), transparent 32%),
+    radial-gradient(circle at 52% 95%, rgba(154,106,255,.22), transparent 30%),
+    radial-gradient(circle at 78% 86%, rgba(217,255,67,.13), transparent 22%);
+  filter: blur(34px);
+  opacity: .9;
+  transform: translateZ(-80px);
+}
+
+.physical-calc-receipt {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 50%;
+  width: 66%;
+  height: 132px;
+  transform: translateX(-50%) rotate(-.7deg) translateZ(-10px);
+  padding: 16px 18px 22px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: #101114;
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.025), transparent 12%, transparent 88%, rgba(0,0,0,.035)),
+    #F7F2E8;
+  border-radius: 7px 7px 2px 2px;
+  border: 1px solid rgba(16,17,20,.09);
+  box-shadow: 0 14px 25px rgba(0,0,0,.24), inset 0 1px rgba(255,255,255,.9);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.physical-calc-receipt::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, transparent 0 19px, rgba(16,17,20,.025) 20px);
+  mix-blend-mode: multiply;
+}
+
+.physical-calc-device {
+  position: relative;
+  z-index: 2;
+  isolation: isolate;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+  transform-origin: 50% 68%;
+  transition: transform 320ms cubic-bezier(.2,.8,.2,1), filter 320ms ease;
+  padding: 26px 22px 25px;
+  border-radius: 34px 34px 42px 42px;
+  border: 1px solid rgba(255,255,255,.10);
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.10), transparent 11%),
+    linear-gradient(155deg, #292c33 0%, #1b1d22 38%, #121318 78%, #0d0e11 100%);
+  box-shadow:
+    0 42px 70px -24px rgba(0,0,0,.86),
+    18px 26px 38px -24px rgba(255,102,84,.22),
+    -18px 24px 42px -26px rgba(82,101,255,.30),
+    inset 0 1px rgba(255,255,255,.12),
+    inset 0 -16px 24px -18px rgba(0,0,0,.92);
+}
+
+.physical-calc-device::before {
+  content: "";
+  position: absolute;
+  z-index: -2;
+  inset: 10px -13px -16px 13px;
+  border-radius: 34px 34px 46px 46px;
+  background: linear-gradient(155deg, #16181d, #07080a 72%);
+  border: 1px solid rgba(255,255,255,.035);
+  box-shadow: 0 24px 36px rgba(0,0,0,.48);
+  transform: translateZ(-35px);
+}
+
+.physical-calc-device::after {
+  content: "";
+  position: absolute;
+  z-index: 10;
+  pointer-events: none;
+  inset: 1px 1px auto;
+  height: 46%;
+  border-radius: 33px 33px 48% 48%;
+  background: linear-gradient(180deg, rgba(255,255,255,.055), transparent 42%);
+  opacity: .55;
+}
+
+.physical-calc-slot {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  top: 10px;
+  width: 65%;
+  height: 12px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #050506, #14161a 70%, #24262b);
+  box-shadow: inset 0 4px 7px rgba(0,0,0,.92), 0 1px rgba(255,255,255,.07);
+}
+
+.physical-calc-brandrow {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 4px 13px;
+}
+
+.physical-led {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  box-shadow: 0 0 14px currentColor;
+  opacity: .72;
+}
+
+.physical-calc-console {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 88px;
+  gap: 13px;
+  align-items: stretch;
+}
+
+.physical-calc-display {
+  min-height: 105px;
+  padding: 15px 17px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,.055);
+  background:
+    radial-gradient(circle at 20% 0%, rgba(82,101,255,.05), transparent 48%),
+    linear-gradient(160deg, #060708, #0d0e11 74%);
+  box-shadow:
+    inset 0 8px 16px rgba(0,0,0,.64),
+    inset 0 -1px rgba(255,255,255,.05),
+    0 7px 15px rgba(0,0,0,.34);
+}
+
+.physical-calc-display.is-error {
+  border-color: rgba(255,102,84,.45);
+}
+
+.physical-calc-display > div:last-child {
+  text-shadow: 0 0 18px rgba(217,255,67,.28), 0 0 42px rgba(217,255,67,.08);
+}
+
+.physical-knob-panel {
+  min-height: 105px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,.045);
+  background: linear-gradient(155deg, rgba(255,255,255,.035), rgba(0,0,0,.16));
+  box-shadow: inset 0 1px rgba(255,255,255,.05), inset 0 -8px 18px rgba(0,0,0,.22);
+}
+
+.physical-knob {
+  position: relative;
+  width: 61px;
+  height: 61px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 28%, #e9ebee 0 5%, #8c9198 10%, #383c42 35%, #15171b 68%, #090a0c 100%);
+  border: 2px solid rgba(255,255,255,.22);
+  box-shadow:
+    0 7px 13px rgba(0,0,0,.58),
+    inset 0 1px 2px rgba(255,255,255,.45),
+    0 0 0 5px rgba(154,106,255,.22),
+    0 0 24px rgba(154,106,255,.42);
+}
+
+.physical-knob::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  border: 2px solid rgba(154,106,255,.75);
+  box-shadow: 0 0 18px rgba(154,106,255,.55), inset 0 0 10px rgba(154,106,255,.18);
+}
+
+.physical-knob::after {
+  content: "";
+  position: absolute;
+  top: 7px;
+  left: 50%;
+  width: 2px;
+  height: 13px;
+  border-radius: 99px;
+  background: rgba(255,255,255,.8);
+  transform: translateX(-50%);
+  box-shadow: 0 0 5px rgba(255,255,255,.25);
+}
+
+.physical-calc-vat-row {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.physical-calc-keypad {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 11px;
+  margin-top: 13px;
+}
+
+.physical-key {
+  min-height: 50px;
+  border: 1px solid rgba(255,255,255,.055);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  color: #F5F1E8;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.055), transparent 24%),
+    linear-gradient(180deg, #31343b 0%, #262930 62%, #202228 100%);
+  font-family: var(--font-mono);
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1;
+  user-select: none;
+  box-shadow:
+    0 6px 0 #111318,
+    0 9px 12px rgba(0,0,0,.32),
+    inset 0 1px rgba(255,255,255,.10),
+    inset 0 -3px 5px rgba(0,0,0,.22);
+  transform: translateY(0);
+  transition: transform 90ms ease, box-shadow 90ms ease, filter 150ms ease, background-color 150ms ease;
+}
+
+.physical-key:hover {
+  filter: brightness(1.09);
+}
+
+.physical-key:active,
+.physical-key.sim-active {
+  transform: translateY(5px);
+  box-shadow:
+    0 1px 0 #111318,
+    0 3px 5px rgba(0,0,0,.26),
+    inset 0 2px 6px rgba(0,0,0,.28);
+}
+
+.physical-key-operator {
+  border-color: rgba(82,101,255,.20);
+  background:
+    linear-gradient(180deg, rgba(82,101,255,.11), transparent 32%),
+    linear-gradient(180deg, #32353d 0%, #252830 68%, #202228 100%);
+}
+
+.physical-key-accent {
+  color: #101114;
+  font-weight: 700;
+  border-color: rgba(217,255,67,.55);
+  background: linear-gradient(180deg, #e2ff67, #d9ff43 65%, #bddd25);
+  box-shadow:
+    0 6px 0 #8ca613,
+    0 9px 14px rgba(217,255,67,.13),
+    inset 0 1px rgba(255,255,255,.55);
+}
+
+.physical-key-equals {
+  color: #101114;
+  font-weight: 700;
+  border-color: rgba(255,102,84,.55);
+  background: linear-gradient(180deg, #ff8274, #ff6654 68%, #d84a3c);
+  box-shadow:
+    0 6px 0 #9f332a,
+    0 9px 14px rgba(255,102,84,.14),
+    inset 0 1px rgba(255,255,255,.42);
+}
+
+.physical-key-vat-plus,
+.physical-key-vat-minus {
+  min-height: 47px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+
+.physical-key-vat-plus {
+  color: #101114;
+  border-color: rgba(217,255,67,.52);
+  background: linear-gradient(180deg, #e4ff74, #d9ff43 64%, #bddb26);
+  box-shadow: 0 6px 0 #879f17, 0 9px 14px rgba(217,255,67,.12), inset 0 1px rgba(255,255,255,.55);
+}
+
+.physical-key-vat-minus {
+  color: white;
+  border-color: rgba(82,101,255,.45);
+  background: linear-gradient(180deg, #6a7aff, #5265ff 66%, #3e4ccd);
+  box-shadow: 0 6px 0 #2733a0, 0 9px 14px rgba(82,101,255,.18), inset 0 1px rgba(255,255,255,.28);
+}
+
+.physical-calc-footlight {
+  position: absolute;
+  left: 50%;
+  bottom: -9px;
+  width: 76px;
+  height: 7px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: linear-gradient(90deg, #5265FF, #9A6AFF 48%, #D9FF43);
+  box-shadow: 0 0 16px rgba(154,106,255,.7), 0 0 30px rgba(82,101,255,.30);
+}
+
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -109,6 +448,56 @@ html[lang="en"] .font-display {
 .mask-image-bottom {
   mask-image: linear-gradient(to top, black 80%, transparent 100%);
   -webkit-mask-image: linear-gradient(to top, black 80%, transparent 100%);
+}
+
+@media (max-width: 639px) {
+  .physical-calc-scene {
+    padding-top: 72px;
+  }
+
+  .physical-calc-receipt {
+    width: 70%;
+    height: 105px;
+    padding: 12px 13px 17px;
+    font-size: 8px;
+  }
+
+  .physical-calc-device {
+    padding: 22px 15px 20px;
+    border-radius: 28px 28px 34px 34px;
+  }
+
+  .physical-calc-console {
+    grid-template-columns: minmax(0, 1fr) 72px;
+    gap: 9px;
+  }
+
+  .physical-calc-display,
+  .physical-knob-panel {
+    min-height: 86px;
+  }
+
+  .physical-knob {
+    width: 48px;
+    height: 48px;
+  }
+
+  .physical-calc-keypad {
+    gap: 8px;
+  }
+
+  .physical-key {
+    min-height: 44px;
+    border-radius: 12px;
+    font-size: 15px;
+    box-shadow: 0 5px 0 #111318, 0 7px 9px rgba(0,0,0,.28), inset 0 1px rgba(255,255,255,.09);
+  }
+
+  .physical-key-vat-plus,
+  .physical-key-vat-minus {
+    min-height: 43px;
+    font-size: 9px;
+  }
 }
 
 @media (pointer: fine) {
@@ -147,6 +536,10 @@ html[lang="en"] .font-display {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  .physical-calc-device {
+    transform: none !important;
   }
 
   body,
