@@ -1,6 +1,6 @@
 import React, { useState, useEffect, forwardRef, useImperativeHandle, useRef } from 'react';
 import { cn } from '../utils/cn';
-import { APP_CONFIG } from '../config';
+import { APP_CONFIG, getFinanceLocale } from '../config';
 import { useLanguage } from '../context/LanguageContext';
 
 export type CalculatorHandle = {
@@ -14,15 +14,19 @@ interface CalculatorProps {
   isInteractive?: boolean;
 }
 
+type ReceiptEntryKind = 'entry' | 'operation' | 'total' | 'vat-add' | 'vat-remove';
+
 interface ReceiptEntry {
   id: number;
-  label: string;
-  amount: string;
+  kind: ReceiptEntryKind;
+  amount: number;
+  operator?: string;
 }
 
 export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
   ({ className, onInteract, isInteractive = true }, ref) => {
     const { t, language } = useLanguage();
+    const finance = getFinanceLocale(language);
     const [display, setDisplay] = useState('0');
     const [previousValue, setPreviousValue] = useState<number | null>(null);
     const [operator, setOperator] = useState<string | null>(null);
@@ -31,6 +35,7 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
     const [activeKey, setActiveKey] = useState<string | null>(null);
 
     const receiptRef = useRef<HTMLDivElement>(null);
+    const rootRef = useRef<HTMLDivElement>(null);
 
     const toDisplayValue = (num: number) => {
       if (!Number.isFinite(num)) return '0';
@@ -43,15 +48,40 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
       return Number.isFinite(parsed) ? parsed : 0;
     };
 
-    const addToReceipt = (label: string, amount: string) => {
-      setReceipt((prev) => [...prev, { id: Date.now() + Math.random(), label, amount }]);
+    const addToReceipt = (kind: ReceiptEntryKind, amount: number, entryOperator?: string) => {
+      setReceipt((prev) => [...prev, {
+        id: Date.now() + Math.random(),
+        kind,
+        amount,
+        operator: entryOperator,
+      }]);
     };
 
-    const formatNumber = (num: number) => {
-      return new Intl.NumberFormat(language === 'tr' ? 'tr-TR' : 'en-US', {
+    const formatCurrency = (num: number) => {
+      return new Intl.NumberFormat(finance.locale, {
+        style: 'currency',
+        currency: finance.code,
+        currencyDisplay: 'narrowSymbol',
         minimumFractionDigits: 0,
         maximumFractionDigits: 2,
       }).format(num);
+    };
+
+    const getReceiptLabel = (entry: ReceiptEntry) => {
+      switch (entry.kind) {
+        case 'entry':
+          return t('calc.entry');
+        case 'operation':
+          return entry.operator || '';
+        case 'total':
+          return t('calc.total');
+        case 'vat-add':
+          return `+ ${t('calc.vat')} ${APP_CONFIG.vatRate}%`;
+        case 'vat-remove':
+          return `− ${t('calc.vat')} ${APP_CONFIG.vatRate}%`;
+        default:
+          return '';
+      }
     };
 
     const calculate = (a: number, b: number, op: string) => {
@@ -96,13 +126,13 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
         const currentNum = parseDisplay();
         if (previousValue === null) {
           setPreviousValue(currentNum);
-          addToReceipt(t('calc.entry'), formatNumber(currentNum));
+          addToReceipt('entry', currentNum);
         } else if (operator && !waitingForNewValue) {
           const result = calculate(previousValue, currentNum, operator);
           setDisplay(toDisplayValue(result));
           setPreviousValue(result);
-          addToReceipt(operator, formatNumber(currentNum));
-          addToReceipt(t('calc.total'), formatNumber(result));
+          addToReceipt('operation', currentNum, operator);
+          addToReceipt('total', result);
         }
         setOperator(key);
         setWaitingForNewValue(true);
@@ -111,8 +141,8 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
         if (operator && previousValue !== null) {
           const result = calculate(previousValue, currentNum, operator);
           setDisplay(toDisplayValue(result));
-          addToReceipt(operator, formatNumber(currentNum));
-          addToReceipt(t('calc.total'), formatNumber(result));
+          addToReceipt('operation', currentNum, operator);
+          addToReceipt('total', result);
           setPreviousValue(null);
           setOperator(null);
           setWaitingForNewValue(true);
@@ -122,16 +152,16 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
         const vatAmount = currentNum * (APP_CONFIG.vatRate / 100);
         const total = currentNum + vatAmount;
         setDisplay(toDisplayValue(total));
-        addToReceipt(`+ ${t('calc.vat')} ${APP_CONFIG.vatRate}%`, formatNumber(vatAmount));
-        addToReceipt(t('calc.total'), formatNumber(total));
+        addToReceipt('vat-add', vatAmount);
+        addToReceipt('total', total);
         setWaitingForNewValue(true);
       } else if (key === 'VAT-') {
         const currentNum = parseDisplay();
         const net = currentNum / (1 + APP_CONFIG.vatRate / 100);
         const vatAmount = currentNum - net;
         setDisplay(toDisplayValue(net));
-        addToReceipt(`− ${t('calc.vat')} ${APP_CONFIG.vatRate}%`, formatNumber(vatAmount));
-        addToReceipt(t('calc.total'), formatNumber(net));
+        addToReceipt('vat-remove', vatAmount);
+        addToReceipt('total', net);
         setWaitingForNewValue(true);
       } else if (key === '%') {
         const currentNum = parseDisplay();
@@ -159,12 +189,24 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
 
     useEffect(() => {
       const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+        const target = e.target as HTMLElement | null;
+        if (target?.closest('input, textarea, select, [contenteditable="true"]')) return;
+
+        const root = rootRef.current;
+        if (!root) return;
+        const rect = root.getBoundingClientRect();
+        const isVisible = rect.bottom > 0 && rect.top < window.innerHeight && rect.right > 0 && rect.left < window.innerWidth;
+        if (!isVisible) return;
+
         const keyMap: Record<string, string> = {
           Enter: '=',
           Escape: 'C',
           Backspace: '⌫',
           '*': '×',
           '/': '÷',
+          ',': language === 'tr' ? '.' : ',',
         };
         const mappedKey = keyMap[e.key] || e.key;
         const validKeys = ['0','1','2','3','4','5','6','7','8','9','.','+','-','×','÷','=','C','⌫','%'];
@@ -177,22 +219,28 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
       };
       window.addEventListener('keydown', handleKeyDown);
       return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [display, previousValue, operator, waitingForNewValue, isInteractive]);
+    }, [display, previousValue, operator, waitingForNewValue, isInteractive, language]);
 
-    const renderKey = (label: string, colSpan: number = 1, variant: 'default' | 'accent' | 'operator' = 'default') => {
+    const renderKey = (
+      label: string,
+      colSpan: number = 1,
+      variant: 'default' | 'accent' | 'operator' = 'default',
+      actionKey: string = label,
+      ariaLabel?: string,
+    ) => {
       const baseClass = 'calc-btn relative flex items-center justify-center rounded-lg text-lg sm:text-xl font-mono select-none overflow-hidden active:translate-y-[2px]';
       const variants = {
         default: 'bg-[#2A2B30] text-warm-paper hover:bg-[#32343A]',
         operator: 'bg-electric-blue text-white hover:bg-opacity-90',
         accent: 'bg-acid-lime text-deep-ink hover:bg-opacity-90',
       };
-      const isSimActive = activeKey === label;
+      const isSimActive = activeKey === actionKey;
 
       return (
         <button
           type="button"
-          aria-label={label}
-          onClick={() => handlePress(label, 'user')}
+          aria-label={ariaLabel || label}
+          onClick={() => handlePress(actionKey, 'user')}
           className={cn(
             baseClass,
             variants[variant],
@@ -215,7 +263,9 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
           <button
             key={key}
             type="button"
-            aria-label={key === 'VAT+' ? `${t('calc.vat')} ekle` : `${t('calc.vat')} çıkar`}
+            aria-label={key === 'VAT+'
+              ? (language === 'tr' ? `${t('calc.vat')} ekle` : `Add ${t('calc.vat')}`)
+              : (language === 'tr' ? `${t('calc.vat')} çıkar` : `Remove ${t('calc.vat')}`)}
             onClick={() => handlePress(key, 'user')}
             className={cn(
               'calc-btn bg-acid-lime text-deep-ink font-mono text-[10px] sm:text-xs font-bold select-none',
@@ -229,7 +279,7 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
     );
 
     return (
-      <div className={cn('relative w-full max-w-[280px] sm:max-w-[340px] perspective-1000 mx-auto', className)}>
+      <div ref={rootRef} className={cn('relative w-full max-w-[280px] sm:max-w-[340px] perspective-1000 mx-auto', className)}>
         <div
           className="absolute left-1/2 -top-24 w-3/4 -translate-x-1/2 h-32 bg-[#F9F7F1] text-deep-ink font-mono text-xs p-4 rounded-t-sm shadow-md overflow-hidden flex flex-col justify-end uppercase"
           style={{ transformOrigin: 'bottom center', zIndex: 0 }}
@@ -238,10 +288,10 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
             {receipt.map((entry) => (
               <div key={entry.id} className={cn(
                 'flex justify-between w-full',
-                entry.label === t('calc.total') && 'border-t border-dashed border-deep-ink/30 pt-1 font-bold mt-1'
+                entry.kind === 'total' && 'border-t border-dashed border-deep-ink/30 pt-1 font-bold mt-1'
               )}>
-                <span className="opacity-70">{entry.label}</span>
-                <span>{APP_CONFIG.currency}{entry.amount}</span>
+                <span className="opacity-70">{getReceiptLabel(entry)}</span>
+                <span>{formatCurrency(entry.amount)}</span>
               </div>
             ))}
           </div>
@@ -266,7 +316,7 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
                 className="text-3xl sm:text-4xl font-mono text-acid-lime tracking-tight tabular-nums truncate w-full text-right"
                 style={{ textShadow: '0 0 10px rgba(217,255,67,0.3)' }}
               >
-                {display}
+                {language === 'tr' ? display.replace('.', ',') : display}
               </div>
             </div>
           </div>
@@ -294,7 +344,13 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
 
             {renderVatKey()}
             {renderKey('0')}
-            {renderKey('.')}
+            {renderKey(
+              language === 'tr' ? ',' : '.',
+              1,
+              'default',
+              '.',
+              language === 'tr' ? 'Ondalık ayırıcı' : 'Decimal point'
+            )}
             {renderKey('=', 1, 'operator')}
           </div>
         </div>
