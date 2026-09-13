@@ -340,35 +340,43 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
       return () => window.removeEventListener('keydown', handleKeyDown);
     }, [display, previousValue, operator, waitingForNewValue, error, language]);
 
+    const handleTilt = (event: React.PointerEvent<HTMLDivElement>) => {
+      if (event.pointerType === 'touch' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      const rect = event.currentTarget.getBoundingClientRect();
+      const x = (event.clientX - rect.left) / rect.width - 0.5;
+      const y = (event.clientY - rect.top) / rect.height - 0.5;
+      event.currentTarget.style.setProperty('--tilt-x', `${(-y * 5 + 2.4).toFixed(2)}deg`);
+      event.currentTarget.style.setProperty('--tilt-y', `${(x * 7 - 4).toFixed(2)}deg`);
+    };
+
+    const resetTilt = (event: React.PointerEvent<HTMLDivElement>) => {
+      event.currentTarget.style.setProperty('--tilt-x', '2.4deg');
+      event.currentTarget.style.setProperty('--tilt-y', '-4deg');
+    };
+
     const renderKey = (
       label: string,
       colSpan: number = 1,
-      variant: 'default' | 'accent' | 'operator' = 'default',
+      variant: 'default' | 'accent' | 'operator' | 'equals' = 'default',
       actionKey: string = label,
       ariaLabel?: string,
-    ) => {
-      const variants = {
-        default: 'bg-[#292B31] text-warm-paper hover:bg-[#33363D]',
-        operator: 'bg-electric-blue text-white hover:bg-[#6474FF]',
-        accent: 'bg-acid-lime text-deep-ink hover:bg-[#E1FF69]',
-      };
-
-      return (
-        <button
-          type="button"
-          aria-label={ariaLabel || label}
-          onClick={() => handlePress(actionKey, 'user')}
-          className={cn(
-            'calc-btn min-h-[52px] sm:min-h-[58px] rounded-xl flex items-center justify-center font-mono text-lg sm:text-xl select-none',
-            variants[variant],
-            activeKey === actionKey && 'sim-active',
-            colSpan === 2 && 'col-span-2'
-          )}
-        >
-          {label}
-        </button>
-      );
-    };
+    ) => (
+      <button
+        type="button"
+        aria-label={ariaLabel || label}
+        onClick={() => handlePress(actionKey, 'user')}
+        className={cn(
+          'physical-key',
+          variant === 'operator' && 'physical-key-operator',
+          variant === 'accent' && 'physical-key-accent',
+          variant === 'equals' && 'physical-key-equals',
+          activeKey === actionKey && 'sim-active',
+          colSpan === 2 && 'col-span-2'
+        )}
+      >
+        {label}
+      </button>
+    );
 
     return (
       <div
@@ -381,9 +389,13 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
           const target = event.target as HTMLElement;
           if (!target.closest('button')) rootRef.current?.focus({ preventScroll: true });
         }}
-        className={cn('native-cursor calculator-root relative w-full max-w-[300px] sm:max-w-[350px] perspective-1000 mx-auto outline-none', className)}
+        onPointerMove={handleTilt}
+        onPointerLeave={resetTilt}
+        className={cn('native-cursor physical-calc-scene w-full max-w-[430px] mx-auto outline-none', className)}
       >
-        <div className="absolute left-1/2 -top-[102px] w-[84%] -translate-x-1/2 h-[122px] bg-[#F9F7F1] text-deep-ink font-mono text-[10px] sm:text-xs p-4 rounded-t-md shadow-md overflow-hidden flex flex-col uppercase" style={{ zIndex: 0 }}>
+        <div className="physical-calc-glow" aria-hidden="true" />
+
+        <div className="physical-calc-receipt" aria-hidden={receipt.length === 0 ? undefined : undefined}>
           <div className="flex items-center justify-between pb-2 border-b border-deep-ink/12 text-[8px] sm:text-[9px] tracking-[0.18em] opacity-50">
             <span>{language === 'tr' ? 'İşlem fişi' : 'Calculation tape'}</span>
             <span>{finance.code}</span>
@@ -400,51 +412,59 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
           </div>
         </div>
 
-        <div className="calc-shadow relative z-10 bg-[#1A1C21] rounded-[28px] p-4 sm:p-5 border border-white/8 flex flex-col gap-3.5 sm:gap-4">
-          <div className="flex items-center justify-between px-1">
+        <div className="physical-calc-device">
+          <div className="physical-calc-slot" aria-hidden="true" />
+
+          <div className="physical-calc-brandrow">
             <div>
-              <p className="font-mono text-[9px] text-white/28 tracking-[0.18em] uppercase">Sayısal / Calc</p>
+              <p className="font-mono text-[9px] text-white/32 tracking-[0.18em] uppercase">Sayısal / Calc</p>
               <p className="font-mono text-[8px] text-white/18 tracking-[0.12em] uppercase mt-0.5">{finance.code} · {APP_CONFIG.vatRate}% {t('calc.vat')}</p>
             </div>
-            <div className="flex gap-1.5" aria-hidden="true">
-              <span className="w-2 h-2 rounded-full bg-coral/60" />
-              <span className="w-2 h-2 rounded-full bg-acid-lime/60" />
+            <div className="flex items-center gap-1.5" aria-hidden="true">
+              <span className="physical-led bg-coral" />
+              <span className="physical-led bg-acid-lime" />
             </div>
           </div>
 
-          <div className={cn('bg-[#0E0F12] rounded-2xl px-4 py-3 min-h-[92px] flex flex-col items-end justify-end shadow-inner border transition-colors overflow-hidden', error ? 'border-coral/50' : 'border-white/5')}>
-            <div className="w-full flex items-center justify-between min-h-5 mb-1 font-mono text-[9px] uppercase tracking-[0.16em]">
-              <span className="text-white/20">{keyboardActive ? (language === 'tr' ? 'Klavye aktif' : 'Keyboard active') : ''}</span>
-              <span className="text-acid-lime/55">{operator || ''}</span>
+          <div className="physical-calc-console">
+            <div className={cn('physical-calc-display', error && 'is-error')}>
+              <div className="flex items-center justify-between min-h-5 mb-1 font-mono text-[8px] sm:text-[9px] uppercase tracking-[0.16em]">
+                <span className="text-white/18">{keyboardActive ? (language === 'tr' ? 'Klavye aktif' : 'Keyboard active') : (language === 'tr' ? 'Hazır' : 'Ready')}</span>
+                <span className="text-acid-lime/55">{operator || ''}</span>
+              </div>
+              <div
+                aria-live="polite"
+                aria-atomic="true"
+                className={cn('w-full text-right font-mono tracking-[-0.04em] tabular-nums truncate', error ? 'text-2xl text-coral' : 'text-[2rem] sm:text-[2.45rem] text-acid-lime')}
+              >
+                {formatLiveDisplay(display)}
+              </div>
             </div>
-            <div
-              aria-live="polite"
-              aria-atomic="true"
-              className={cn('w-full text-right font-mono tracking-tight tabular-nums truncate', error ? 'text-2xl text-coral' : 'text-3xl sm:text-[2.15rem] text-acid-lime')}
-              style={!error ? { textShadow: '0 0 12px rgba(217,255,67,0.24)' } : undefined}
-            >
-              {formatLiveDisplay(display)}
+
+            <div className="physical-knob-panel" aria-hidden="true">
+              <div className="physical-knob"><span /></div>
+              <span className="font-mono text-[7px] tracking-[0.2em] uppercase text-white/22">Mode</span>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
+          <div className="physical-calc-vat-row">
             <button
               type="button"
               onClick={() => handlePress('VAT+', 'user')}
-              className={cn('calc-btn min-h-11 rounded-xl bg-acid-lime text-deep-ink font-mono text-[10px] sm:text-xs font-bold flex items-center justify-center gap-1.5', activeKey === 'VAT+' && 'sim-active')}
+              className={cn('physical-key physical-key-vat-plus', activeKey === 'VAT+' && 'sim-active')}
             >
               <span>+</span><span>{t('calc.vat')}</span><span>{APP_CONFIG.vatRate}%</span>
             </button>
             <button
               type="button"
               onClick={() => handlePress('VAT-', 'user')}
-              className={cn('calc-btn min-h-11 rounded-xl bg-[#F5F1E8] text-deep-ink font-mono text-[10px] sm:text-xs font-bold flex items-center justify-center gap-1.5', activeKey === 'VAT-' && 'sim-active')}
+              className={cn('physical-key physical-key-vat-minus', activeKey === 'VAT-' && 'sim-active')}
             >
               <span>−</span><span>{t('calc.vat')}</span><span>{APP_CONFIG.vatRate}%</span>
             </button>
           </div>
 
-          <div className="grid grid-cols-4 gap-2 sm:gap-2.5">
+          <div className="physical-calc-keypad">
             {renderKey('C', 1, 'accent', 'C', language === 'tr' ? 'Temizle' : 'Clear')}
             {renderKey('⌫', 1, 'default', '⌫', language === 'tr' ? 'Geri sil' : 'Backspace')}
             {renderKey('%', 1, 'operator')}
@@ -455,11 +475,13 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
             {renderKey('1')}{renderKey('2')}{renderKey('3')}{renderKey('+', 1, 'operator')}
             {renderKey('0', 2)}
             {renderKey(language === 'tr' ? ',' : '.', 1, 'default', '.', language === 'tr' ? 'Ondalık ayırıcı' : 'Decimal point')}
-            {renderKey('=', 1, 'operator')}
+            {renderKey('=', 1, 'equals')}
           </div>
+
+          <div className="physical-calc-footlight" aria-hidden="true" />
         </div>
 
-        <p className="mt-3 text-center font-mono text-[8px] sm:text-[9px] uppercase tracking-[0.16em] text-white/24">
+        <p className="mt-4 text-center font-mono text-[8px] sm:text-[9px] uppercase tracking-[0.16em] text-white/24">
           {isInteractive
             ? (language === 'tr' ? 'Tıkla veya odakla · Klavye destekli' : 'Click or focus · Keyboard enabled')
             : (language === 'tr' ? 'Canlı demo çalışıyor' : 'Live demo running')}
@@ -468,3 +490,5 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
     );
   }
 );
+
+Calculator.displayName = 'Calculator';
