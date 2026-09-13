@@ -8,10 +8,10 @@
   --color-coral: #FF6654;
   --color-vivid-purple: #9A6AFF;
 
-  --font-display: "Bricolage Grotesque", sans-serif;
+  --font-display: "Fredoka", sans-serif;
   --font-body: "DM Sans", sans-serif;
   --font-mono: "IBM Plex Mono", monospace;
-  --font-playful: "Bricolage Grotesque", sans-serif;
+  --font-playful: "Bowlby One SC", sans-serif;
 }
 
 @layer base {
@@ -30,7 +30,7 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
-    font-weight: 800;
+    font-weight: 650;
   }
 
   :focus-visible {
