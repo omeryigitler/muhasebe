@@ -157,11 +157,11 @@ export const Hero = () => {
 
       storyTimeline.to(panel, { autoAlpha: 1, y: 0, duration: 0.35, ease: 'power2.out' }, start);
       storyTimeline.to(symbol, { autoAlpha: 0.18, scale: 1, rotation: index % 2 === 0 ? 6 : -6, duration: 0.45, ease: 'back.out(1.4)' }, start);
-      storyTimeline.to(calcWrapperRef.current, { y: index % 2 === 0 ? -10 : 10, rotationZ: index % 2 === 0 ? -1.2 : 1.2, duration: 0.55, ease: 'power2.inOut' }, start + 0.1);
+      storyTimeline.to(calcWrapperRef.current, { y: index % 2 === 0 ? -8 : 8, rotationZ: index % 2 === 0 ? -1.2 : 1.2, duration: 0.55, ease: 'power2.inOut' }, start + 0.1);
 
       if (index < storySteps.length - 1) {
-        storyTimeline.to(panel, { autoAlpha: 0, y: -34, duration: 0.3, ease: 'power2.in' }, start + 0.92);
-        storyTimeline.to(symbol, { autoAlpha: 0, scale: 1.25, duration: 0.3, ease: 'power2.in' }, start + 0.92);
+        storyTimeline.to(panel, { autoAlpha: 0, y: -30, duration: 0.3, ease: 'power2.in' }, start + 0.92);
+        storyTimeline.to(symbol, { autoAlpha: 0, scale: 1.2, duration: 0.3, ease: 'power2.in' }, start + 0.92);
       }
     });
 
@@ -173,61 +173,61 @@ export const Hero = () => {
   }, { scope: container, dependencies: [language] });
 
   return (
-    <section ref={container} className="relative min-h-[520svh] motion-reduce:min-h-[100svh] bg-deep-ink text-warm-paper">
-      <div className="sticky top-0 min-h-[100svh] h-[100svh] w-full overflow-hidden px-6 md:px-12 pt-24 pb-8 flex items-center">
+    <section id="top" ref={container} className="relative min-h-[420svh] lg:min-h-[520svh] motion-reduce:min-h-[100svh] bg-deep-ink text-warm-paper">
+      <div className="sticky top-0 min-h-[100svh] h-[100svh] w-full overflow-hidden px-4 sm:px-6 md:px-12 pt-20 sm:pt-24 pb-3 sm:pb-8 flex items-center">
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute top-[16%] left-[8%] text-9xl font-mono text-acid-lime opacity-[0.06] rotate-12 blur-sm">%</div>
-          <div className="absolute bottom-[12%] right-[8%] text-9xl font-mono text-electric-blue opacity-[0.06] -rotate-12 blur-sm">€</div>
+          <div className="absolute top-[16%] left-[8%] text-8xl lg:text-9xl font-mono text-acid-lime opacity-[0.06] rotate-12 blur-sm">%</div>
+          <div className="absolute bottom-[12%] right-[8%] text-8xl lg:text-9xl font-mono text-electric-blue opacity-[0.06] -rotate-12 blur-sm">€</div>
           <div className="absolute left-1/2 top-0 h-full w-px bg-gradient-to-b from-transparent via-white/10 to-transparent hidden lg:block" />
         </div>
 
-        <div className="max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center relative z-10">
-          <div className="relative min-h-[300px] sm:min-h-[330px] lg:min-h-[560px] order-2 lg:order-1 lg:pr-8">
-            <div ref={heroCopyRef} className="absolute inset-0 flex flex-col justify-center gap-6">
-              <div className="text-xs font-mono tracking-widest text-acid-lime uppercase overflow-hidden">
+        <div className="max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-2 gap-1 sm:gap-4 lg:gap-16 items-center relative z-10">
+          <div className="relative min-h-[245px] sm:min-h-[330px] lg:min-h-[560px] order-2 lg:order-1 lg:pr-8">
+            <div ref={heroCopyRef} className="absolute inset-0 flex flex-col justify-center gap-3 sm:gap-5 lg:gap-6">
+              <div className="text-[10px] sm:text-xs font-mono tracking-widest text-acid-lime uppercase overflow-hidden">
                 <span ref={eyebrowRef} className="block">{t('hero.eyebrow')}</span>
               </div>
 
-              <h1 ref={headlineRef} className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-[6rem] leading-[0.9] flex flex-col gap-2 font-black tracking-tight">
+              <h1 ref={headlineRef} className="font-display text-[2.7rem] leading-[0.86] sm:text-6xl md:text-7xl lg:text-[6rem] lg:leading-[0.9] flex flex-col gap-1 sm:gap-2 font-black tracking-tight">
                 <span className="block text-fruitz-lime">{t('hero.t1')}</span>
                 <span className="block text-fruitz-coral">{t('hero.t2')}</span>
                 <span className="block text-fruitz-purple">{t('hero.t3')}</span>
               </h1>
 
-              <p ref={subtextRef} className="text-lg md:text-xl text-warm-paper/70 max-w-md">{t('hero.desc')}</p>
+              <p ref={subtextRef} className="text-sm sm:text-base md:text-xl text-warm-paper/70 max-w-md leading-relaxed">{t('hero.desc')}</p>
 
-              <div ref={actionsRef} className="flex flex-wrap gap-4 mt-2">
+              <div ref={actionsRef} className="flex flex-wrap gap-2 sm:gap-4 mt-1 sm:mt-2">
                 <Magnetic>
-                  <a href="#contact" className="bg-acid-lime text-deep-ink px-8 py-4 rounded-full font-bold hover:bg-white transition-colors uppercase tracking-widest text-sm inline-block">{t('hero.cta1')}</a>
+                  <a href="#contact" className="bg-acid-lime text-deep-ink px-5 py-3 sm:px-8 sm:py-4 rounded-full font-bold hover:bg-white transition-colors uppercase tracking-widest text-[10px] sm:text-sm inline-block">{t('hero.cta1')}</a>
                 </Magnetic>
                 <Magnetic>
-                  <a href="#services" className="bg-transparent border border-white/20 px-8 py-4 rounded-full font-bold hover:bg-white/5 transition-colors uppercase tracking-widest text-sm inline-block">{t('hero.cta2')}</a>
+                  <a href="#services" className="bg-transparent border border-white/20 px-5 py-3 sm:px-8 sm:py-4 rounded-full font-bold hover:bg-white/5 transition-colors uppercase tracking-widest text-[10px] sm:text-sm inline-block">{t('hero.cta2')}</a>
                 </Magnetic>
               </div>
             </div>
 
             {storySteps.map((step) => (
               <div key={step.index} className="story-panel absolute inset-0 flex flex-col justify-center pointer-events-none">
-                <div className="flex items-center gap-3 mb-6">
-                  <span className="font-mono text-xs tracking-[0.35em] text-white/35">{step.index}</span>
-                  <span className="h-px w-12 bg-white/20" />
-                  <span className="font-mono text-xs uppercase tracking-[0.24em] text-white/55">{step.kicker}</span>
+                <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-6">
+                  <span className="font-mono text-[9px] sm:text-xs tracking-[0.35em] text-white/35">{step.index}</span>
+                  <span className="h-px w-8 sm:w-12 bg-white/20" />
+                  <span className="font-mono text-[9px] sm:text-xs uppercase tracking-[0.2em] sm:tracking-[0.24em] text-white/55">{step.kicker}</span>
                 </div>
-                <h2 className="font-display text-5xl sm:text-6xl lg:text-7xl leading-[0.92] tracking-tight max-w-xl">{step.title}</h2>
-                <p className="mt-6 text-base md:text-xl text-white/60 max-w-lg leading-relaxed">{step.description}</p>
-                <div className="mt-8 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.25em] text-white/30">
+                <h2 className="font-display text-3xl sm:text-5xl lg:text-7xl leading-[0.92] tracking-tight max-w-xl">{step.title}</h2>
+                <p className="mt-3 sm:mt-6 text-sm sm:text-base md:text-xl text-white/60 max-w-lg leading-relaxed">{step.description}</p>
+                <div className="mt-4 sm:mt-8 flex items-center gap-3 font-mono text-[9px] sm:text-[11px] uppercase tracking-[0.22em] text-white/30">
                   <span>{storyCopy.live}</span>
-                  <span className="w-2 h-2 rounded-full bg-acid-lime animate-pulse" />
+                  <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-acid-lime animate-pulse" />
                 </div>
-                <div className={`story-symbol absolute -right-4 lg:-right-12 top-1/2 -translate-y-1/2 text-[11rem] lg:text-[17rem] font-display font-black leading-none ${step.accent}`}>{step.symbol}</div>
+                <div className={`story-symbol absolute -right-2 sm:-right-4 lg:-right-12 top-1/2 -translate-y-1/2 text-[8rem] sm:text-[11rem] lg:text-[17rem] font-display font-black leading-none ${step.accent}`}>{step.symbol}</div>
               </div>
             ))}
           </div>
 
-          <div className="order-1 lg:order-2 flex justify-center lg:justify-end perspective-1000 pl-4 pr-4 lg:pr-8">
-            <div ref={calcWrapperRef} className="w-full max-w-[300px] will-change-transform">
+          <div className="order-1 lg:order-2 flex justify-center lg:justify-end perspective-1000 px-2 lg:pl-4 lg:pr-8">
+            <div ref={calcWrapperRef} className="w-full max-w-[210px] min-[390px]:max-w-[225px] sm:max-w-[270px] lg:max-w-[300px] will-change-transform">
               <Calculator ref={calcRef} isInteractive={isInteractive} onInteract={takeControl} />
-              <div className="mt-6 flex items-center justify-center gap-3 font-mono text-[10px] uppercase tracking-[0.22em] text-white/30">
+              <div className="mt-2 sm:mt-5 flex items-center justify-center gap-2 sm:gap-3 font-mono text-[8px] sm:text-[10px] uppercase tracking-[0.18em] sm:tracking-[0.22em] text-white/30">
                 <span>{isInteractive ? storyCopy.calculatorReady : storyCopy.calculatorRunning}</span>
                 <span className={`w-1.5 h-1.5 rounded-full ${isInteractive ? 'bg-acid-lime' : 'bg-coral animate-pulse'}`} />
               </div>
@@ -235,7 +235,7 @@ export const Hero = () => {
           </div>
         </div>
 
-        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 hidden md:flex motion-reduce:hidden flex-col items-center gap-2 pointer-events-none">
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 hidden md:flex motion-reduce:hidden flex-col items-center gap-2 pointer-events-none">
           <span className="font-mono text-[9px] uppercase tracking-[0.35em] text-white/25">{storyCopy.scroll}</span>
           <span className="h-8 w-px bg-gradient-to-b from-white/30 to-transparent" />
         </div>
