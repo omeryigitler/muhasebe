@@ -72,12 +72,12 @@ export const KineticMarquee = () => {
   const text = t('marquee');
 
   return (
-    <section ref={container} className="relative py-14 md:py-20 bg-deep-ink overflow-hidden border-y border-white/5">
+    <section ref={container} className="relative py-12 md:py-20 bg-deep-ink overflow-hidden border-y border-white/5">
       <div className="absolute inset-y-0 left-1/2 w-px bg-white/[0.035]" />
 
       <div
         ref={topTrack}
-        className="whitespace-nowrap font-playful text-6xl md:text-8xl lg:text-[8.2rem] leading-[0.92] tracking-[-0.035em] text-acid-lime will-change-transform"
+        className="whitespace-nowrap font-playful text-5xl md:text-8xl lg:text-[8.2rem] leading-[0.92] tracking-[-0.035em] text-acid-lime will-change-transform"
         style={{ width: '240%', transformOrigin: 'center' }}
       >
         {text.repeat(5)}
@@ -85,7 +85,7 @@ export const KineticMarquee = () => {
 
       <div
         ref={bottomTrack}
-        className="mt-4 md:mt-7 whitespace-nowrap font-playful text-5xl md:text-7xl lg:text-[7.3rem] leading-[0.92] tracking-[-0.035em] text-transparent opacity-40 will-change-transform"
+        className="mt-3 md:mt-7 whitespace-nowrap font-playful text-4xl md:text-7xl lg:text-[7.3rem] leading-[0.92] tracking-[-0.035em] text-transparent opacity-40 will-change-transform"
         style={{ width: '240%', WebkitTextStroke: '1px rgba(245,241,232,0.38)' }}
       >
         {text.repeat(5)}
