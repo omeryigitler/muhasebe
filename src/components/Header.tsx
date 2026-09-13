@@ -3,32 +3,89 @@ import { APP_CONFIG } from '../config';
 import { useLanguage } from '../context/LanguageContext';
 import { cn } from '../utils/cn';
 
+const SECTION_IDS = ['services', 'tools', 'process', 'contact'] as const;
+type SectionId = typeof SECTION_IDS[number];
+
 export const Header = () => {
   const { t, language, toggleLanguage } = useLanguage();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
-  const lastScrollYRef = useRef(0);
+  const [activeSection, setActiveSection] = useState<SectionId | null>(null);
+  const lastDecisionScrollRef = useRef(0);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const menuPanelRef = useRef<HTMLDivElement>(null);
   const firstMobileLinkRef = useRef<HTMLAnchorElement>(null);
+
+  const navLinks = [
+    { id: 'services' as const, href: '#services', label: t('nav.services'), index: '01' },
+    { id: 'tools' as const, href: '#tools', label: t('nav.tools'), index: '02' },
+    { id: 'process' as const, href: '#process', label: t('nav.process'), index: '03' },
+    { id: 'contact' as const, href: '#contact', label: t('nav.contact'), index: '04' },
+  ];
 
   useEffect(() => {
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      const previousScrollY = lastScrollYRef.current;
+      const currentY = window.scrollY;
+      setIsScrolled(currentY > 36);
 
-      setIsScrolled(currentScrollY > 50);
-      setIsVisible(!(currentScrollY > previousScrollY && currentScrollY > 100));
-      lastScrollYRef.current = currentScrollY;
+      if (window.innerWidth >= 768) {
+        setIsVisible(true);
+        lastDecisionScrollRef.current = currentY;
+        return;
+      }
+
+      if (currentY < 72) {
+        setIsVisible(true);
+        lastDecisionScrollRef.current = currentY;
+        return;
+      }
+
+      const delta = currentY - lastDecisionScrollRef.current;
+      if (Math.abs(delta) < 28) return;
+
+      setIsVisible(delta < 0);
+      lastDecisionScrollRef.current = currentY;
     };
 
+    handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   useEffect(() => {
+    const elements = SECTION_IDS
+      .map((id) => document.getElementById(id))
+      .filter((element): element is HTMLElement => Boolean(element));
+
+    if (!elements.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+        if (visible?.target.id && SECTION_IDS.includes(visible.target.id as SectionId)) {
+          setActiveSection(visible.target.id as SectionId);
+        }
+      },
+      {
+        rootMargin: '-24% 0px -58% 0px',
+        threshold: [0, 0.1, 0.25, 0.5, 0.75],
+      }
+    );
+
+    elements.forEach((element) => observer.observe(element));
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 768) setIsMenuOpen(false);
+      if (window.innerWidth >= 768) {
+        setIsMenuOpen(false);
+        setIsVisible(true);
+      }
     };
 
     window.addEventListener('resize', handleResize);
@@ -39,12 +96,40 @@ export const Header = () => {
     if (!isMenuOpen) return;
 
     const previousOverflow = document.body.style.overflow;
+    const siteContent = document.getElementById('site-content');
     document.body.style.overflow = 'hidden';
+    if (siteContent) siteContent.inert = true;
+
+    const getFocusable = () => {
+      const panel = menuPanelRef.current;
+      if (!panel) return [] as HTMLElement[];
+      return Array.from(
+        panel.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])')
+      ).filter((element) => !element.hasAttribute('disabled'));
+    };
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
+        event.preventDefault();
         setIsMenuOpen(false);
         window.requestAnimationFrame(() => menuButtonRef.current?.focus());
+        return;
+      }
+
+      if (event.key !== 'Tab') return;
+      const focusable = getFocusable();
+      if (!focusable.length) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+
+      if (event.shiftKey && active === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus();
       }
     };
 
@@ -54,16 +139,14 @@ export const Header = () => {
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = previousOverflow;
+      if (siteContent) siteContent.inert = false;
     };
   }, [isMenuOpen]);
 
-  const navLinks = [
-    { href: '#services', label: t('nav.services') },
-    { href: '#tools', label: t('nav.tools') },
-    { href: '#contact', label: t('nav.contact') },
-  ];
+  const selectLanguage = (next: 'tr' | 'en') => {
+    if (language !== next) toggleLanguage();
+  };
 
-  const languageLabel = language === 'tr' ? 'Switch to English' : 'Türkçeye geç';
   const menuLabel = isMenuOpen
     ? (language === 'tr' ? 'Menüyü kapat' : 'Close menu')
     : (language === 'tr' ? 'Menüyü aç' : 'Open menu');
@@ -72,136 +155,155 @@ export const Header = () => {
     <>
       <header
         className={cn(
-          'fixed top-0 left-0 w-full z-50 transition-all duration-500',
-          !isVisible && !isMenuOpen ? '-translate-y-full' : 'translate-y-0',
-          isScrolled && !isMenuOpen ? 'bg-deep-ink/85 backdrop-blur-md border-b border-white/10 py-3 md:py-4' : 'py-4 md:py-6',
-          isMenuOpen ? 'text-warm-paper' : 'text-white mix-blend-difference'
+          'fixed top-0 left-0 w-full z-50 text-warm-paper transition-[transform,background-color,border-color,padding,box-shadow] duration-300',
+          isVisible || isMenuOpen ? 'translate-y-0' : '-translate-y-full md:translate-y-0',
+          isScrolled && !isMenuOpen
+            ? 'bg-deep-ink/[0.94] border-b border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.18)] py-2.5 md:py-3 backdrop-blur-xl'
+            : 'bg-deep-ink/35 md:bg-transparent border-b border-transparent py-3 md:py-5'
         )}
       >
-        <div className="max-w-7xl mx-auto flex justify-between items-center relative z-50 px-4 md:px-8">
-          <a
-            href="#top"
-            aria-label={language === 'tr' ? `${APP_CONFIG.companyName} ana sayfa` : `${APP_CONFIG.companyName} home`}
-            className="font-display font-black text-2xl tracking-tighter focus-visible:rounded-sm"
-          >
-            {APP_CONFIG.companyName}.
-          </a>
-
-          <nav className="hidden md:flex gap-8 font-mono text-sm uppercase tracking-widest items-center" aria-label={language === 'tr' ? 'Ana navigasyon' : 'Primary navigation'}>
-            {navLinks.map((link) => (
-              <a key={link.href} href={link.href} className="hover:opacity-50 transition-opacity">
-                {link.label}
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
+          <div className="grid grid-cols-[1fr_auto] md:grid-cols-[1fr_auto_1fr] items-center gap-4 min-h-11">
+            <div className="justify-self-start">
+              <a
+                href="#top"
+                aria-label={language === 'tr' ? `${APP_CONFIG.companyName} ana sayfa` : `${APP_CONFIG.companyName} home`}
+                className="font-display font-black text-xl md:text-2xl tracking-tighter hover:text-acid-lime transition-colors focus-visible:rounded-sm"
+              >
+                {APP_CONFIG.companyName}.
               </a>
-            ))}
+            </div>
 
-            <button
-              type="button"
-              onClick={toggleLanguage}
-              aria-label={languageLabel}
-              className="flex items-center ml-4 cursor-pointer relative w-16 h-8 rounded-md bg-[#1A1C21] border border-white/10 shadow-[inset_0_2px_4px_rgba(0,0,0,0.5)] overflow-hidden group"
-            >
-              <span className="absolute inset-0 flex justify-between items-center px-2 font-mono text-[10px] text-white/30 z-0 select-none" aria-hidden="true">
-                <span className={cn('transition-colors', language === 'en' ? 'text-white/50' : 'opacity-0')}>TR</span>
-                <span className={cn('transition-colors', language === 'tr' ? 'text-white/50' : 'opacity-0')}>EN</span>
-              </span>
-              <span
-                aria-hidden="true"
-                className={cn(
-                  'absolute top-1 bottom-1 w-7 rounded z-10 calc-btn flex items-center justify-center font-mono text-[10px] font-bold text-deep-ink transition-all duration-300 ease-out',
-                  language === 'tr'
-                    ? 'left-1 bg-acid-lime translate-x-0'
-                    : 'left-1 bg-electric-blue translate-x-[calc(100%+0.25rem)] text-white'
-                )}
+            <nav className="hidden md:flex items-center justify-center gap-7 lg:gap-9 font-mono text-[11px] uppercase tracking-[0.16em]" aria-label={language === 'tr' ? 'Ana navigasyon' : 'Primary navigation'}>
+              {navLinks.map((link) => {
+                const active = activeSection === link.id;
+                return (
+                  <a
+                    key={link.id}
+                    href={link.href}
+                    aria-current={active ? 'location' : undefined}
+                    className={cn(
+                      'group relative py-3 transition-colors',
+                      active ? 'text-white' : 'text-white/58 hover:text-white'
+                    )}
+                  >
+                    <span className="mr-1.5 text-[8px] text-white/25 group-hover:text-acid-lime/70 transition-colors">{link.index}</span>
+                    {link.label}
+                    <span
+                      className={cn(
+                        'absolute left-0 right-0 -bottom-0.5 h-[2px] rounded-full origin-left transition-transform duration-300',
+                        active ? 'scale-x-100 bg-acid-lime' : 'scale-x-0 bg-acid-lime group-hover:scale-x-100'
+                      )}
+                    />
+                  </a>
+                );
+              })}
+            </nav>
+
+            <div className="hidden md:flex items-center justify-end gap-3">
+              <div className="flex items-center h-10 rounded-full border border-white/12 bg-white/[0.045] p-1 font-mono text-[10px]" role="group" aria-label={language === 'tr' ? 'Dil seçimi' : 'Language selection'}>
+                {(['tr', 'en'] as const).map((item) => (
+                  <button
+                    key={item}
+                    type="button"
+                    onClick={() => selectLanguage(item)}
+                    aria-pressed={language === item}
+                    className={cn(
+                      'min-w-9 h-8 px-2 rounded-full transition-colors uppercase',
+                      language === item
+                        ? item === 'tr' ? 'bg-acid-lime text-deep-ink' : 'bg-electric-blue text-white'
+                        : 'text-white/45 hover:text-white'
+                    )}
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
+
+              <a
+                href="#contact"
+                className="inline-flex h-10 items-center rounded-full border border-white/20 px-5 font-mono text-[11px] uppercase tracking-[0.14em] text-white hover:bg-acid-lime hover:text-deep-ink hover:border-acid-lime transition-colors"
               >
-                {language.toUpperCase()}
-              </span>
-            </button>
-          </nav>
+                {t('nav.talk')}
+              </a>
+            </div>
 
-          <div className="hidden md:block">
-            <a href="#contact" className="inline-block border border-white/30 px-6 py-2 rounded-full font-mono text-sm uppercase tracking-widest hover:bg-white hover:text-black transition-colors">
-              {t('nav.talk')}
-            </a>
-          </div>
+            <div className="md:hidden justify-self-end flex items-center gap-2">
+              <div className="flex items-center h-11 rounded-full border border-white/12 bg-white/[0.05] p-1 font-mono text-[9px]" role="group" aria-label={language === 'tr' ? 'Dil seçimi' : 'Language selection'}>
+                {(['tr', 'en'] as const).map((item) => (
+                  <button
+                    key={item}
+                    type="button"
+                    onClick={() => selectLanguage(item)}
+                    aria-pressed={language === item}
+                    className={cn(
+                      'min-w-9 h-9 rounded-full uppercase transition-colors',
+                      language === item
+                        ? item === 'tr' ? 'bg-acid-lime text-deep-ink' : 'bg-electric-blue text-white'
+                        : 'text-white/45'
+                    )}
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
 
-          <div className="md:hidden flex items-center gap-3">
-            <button
-              type="button"
-              onClick={toggleLanguage}
-              aria-label={languageLabel}
-              className="flex items-center cursor-pointer relative w-14 h-7 rounded-md bg-[#1A1C21] border border-white/10 shadow-[inset_0_2px_4px_rgba(0,0,0,0.5)] overflow-hidden"
-            >
-              <span className="absolute inset-0 flex justify-between items-center px-1.5 font-mono text-[9px] text-white/30 z-0" aria-hidden="true">
-                <span className={cn('transition-colors', language === 'en' ? 'text-white/50' : 'opacity-0')}>TR</span>
-                <span className={cn('transition-colors', language === 'tr' ? 'text-white/50' : 'opacity-0')}>EN</span>
-              </span>
-              <span
-                aria-hidden="true"
-                className={cn(
-                  'absolute top-1 bottom-1 w-6 rounded z-10 calc-btn flex items-center justify-center font-mono text-[9px] font-bold text-deep-ink transition-all duration-300 ease-out',
-                  language === 'tr'
-                    ? 'left-1 bg-acid-lime translate-x-0'
-                    : 'left-1 bg-electric-blue translate-x-[calc(100%+0.125rem)] text-white'
-                )}
+              <button
+                ref={menuButtonRef}
+                type="button"
+                onClick={() => setIsMenuOpen((open) => !open)}
+                aria-expanded={isMenuOpen}
+                aria-controls="mobile-navigation"
+                aria-label={menuLabel}
+                className="min-w-12 h-11 px-2 flex items-center justify-end font-mono text-[11px] uppercase tracking-[0.12em] focus-visible:rounded-sm"
               >
-                {language.toUpperCase()}
-              </span>
-            </button>
-
-            <button
-              ref={menuButtonRef}
-              type="button"
-              onClick={() => setIsMenuOpen((open) => !open)}
-              aria-expanded={isMenuOpen}
-              aria-controls="mobile-navigation"
-              aria-label={menuLabel}
-              className="font-mono text-xs uppercase relative min-w-12 h-10 flex items-center justify-end focus-visible:rounded-sm"
-            >
-              <span className={cn('transition-opacity duration-300', isMenuOpen ? 'opacity-0' : 'opacity-100')}>{t('nav.menu')}</span>
-              <span className={cn('absolute right-0 transition-opacity duration-300', isMenuOpen ? 'opacity-100' : 'opacity-0')} aria-hidden="true">X</span>
-            </button>
+                {isMenuOpen ? 'X' : t('nav.menu')}
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
       <div
+        ref={menuPanelRef}
         id="mobile-navigation"
+        role="dialog"
+        aria-modal="true"
+        aria-label={language === 'tr' ? 'Mobil navigasyon' : 'Mobile navigation'}
         aria-hidden={!isMenuOpen}
         className={cn(
-          'fixed inset-0 bg-deep-ink z-40 md:hidden flex flex-col justify-center px-6 transition-all duration-500 ease-in-out',
-          isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          'fixed inset-0 bg-deep-ink z-40 md:hidden flex flex-col justify-center px-6 pt-20 transition-[opacity,transform] duration-400 ease-out',
+          isMenuOpen ? 'opacity-100 pointer-events-auto translate-y-0' : 'opacity-0 pointer-events-none -translate-y-3'
         )}
       >
-        <nav className="flex flex-col gap-8 font-display text-5xl" aria-label={language === 'tr' ? 'Mobil navigasyon' : 'Mobile navigation'}>
+        <nav className="flex flex-col border-t border-white/10">
           {navLinks.map((link, index) => (
             <a
               ref={index === 0 ? firstMobileLinkRef : undefined}
-              key={link.href}
+              key={link.id}
               href={link.href}
               tabIndex={isMenuOpen ? 0 : -1}
+              aria-current={activeSection === link.id ? 'location' : undefined}
               onClick={() => setIsMenuOpen(false)}
-              className={cn(
-                'text-warm-paper hover:text-acid-lime transition-all duration-300 ease-out',
-                isMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-              )}
-              style={{ transitionDelay: `${isMenuOpen ? 100 + index * 100 : 0}ms` }}
+              className="group flex items-center justify-between gap-5 py-5 border-b border-white/10 text-warm-paper"
             >
-              {link.label}
+              <span className="flex items-baseline gap-4 min-w-0">
+                <span className="font-mono text-[10px] text-white/28">{link.index}</span>
+                <span className="font-display text-4xl min-[390px]:text-5xl leading-none group-hover:text-acid-lime transition-colors truncate">{link.label}</span>
+              </span>
+              <span className={cn('font-display text-4xl leading-none', activeSection === link.id ? 'text-acid-lime' : 'text-white/20')}>›</span>
             </a>
           ))}
-          <a
-            href="#contact"
-            tabIndex={isMenuOpen ? 0 : -1}
-            onClick={() => setIsMenuOpen(false)}
-            className={cn(
-              'mt-8 inline-block w-max border-2 border-white/20 px-8 py-4 rounded-full font-mono text-lg uppercase tracking-widest text-warm-paper hover:bg-white hover:text-deep-ink transition-all duration-300',
-              isMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-            )}
-            style={{ transitionDelay: `${isMenuOpen ? 100 + navLinks.length * 100 : 0}ms` }}
-          >
-            {t('nav.talk')}
-          </a>
         </nav>
+
+        <a
+          href="#contact"
+          tabIndex={isMenuOpen ? 0 : -1}
+          onClick={() => setIsMenuOpen(false)}
+          className="mt-8 min-h-12 inline-flex items-center justify-center self-start bg-acid-lime text-deep-ink px-7 rounded-full font-mono text-sm uppercase tracking-widest"
+        >
+          {t('nav.talk')} ›
+        </a>
       </div>
     </>
   );
