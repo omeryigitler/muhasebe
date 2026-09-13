@@ -102,6 +102,10 @@ html[lang="en"] .font-display {
   --tilt-x: 2.4deg;
   --tilt-y: -4deg;
   position: relative;
+  left: 50%;
+  width: min(430px, 135%);
+  max-width: 430px;
+  transform: translateX(-50%);
   perspective: 1500px;
   padding-top: 92px;
   transform-style: preserve-3d;
@@ -452,6 +456,7 @@ html[lang="en"] .font-display {
 
 @media (max-width: 639px) {
   .physical-calc-scene {
+    width: min(340px, 132%);
     padding-top: 72px;
   }
 
