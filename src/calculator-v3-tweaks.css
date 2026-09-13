@@ -1,19 +1,36 @@
 /* Final calculator V3 refinements. Kept separate so the working calculator logic stays untouched. */
 
-/* Receipt: visually feed the paper into the slot instead of floating above the device. */
+/* Receipt: one continuous sheet that terminates inside the printer slot. */
 .pc3-scene {
   padding-top: 104px;
 }
 
 .pc3-receipt {
-  top: -64px;
-  width: 58%;
-  height: 146px;
+  /* 116px paper + -101px top = 15px bottom edge, right inside the slot. */
+  top: -101px;
+  width: 56%;
+  height: 116px;
   z-index: 0;
+  padding: 13px 15px 15px;
   border-radius: 5px 5px 0 0;
+  border-color: rgba(16,17,20,.07);
   box-shadow:
-    0 8px 18px rgba(0,0,0,.16),
+    0 7px 16px rgba(0,0,0,.15),
     inset 0 1px rgba(255,255,255,.94);
+}
+
+.pc3-receipt-head {
+  padding-bottom: 6px;
+}
+
+.pc3-receipt-lines {
+  height: 62px;
+  gap: 3px;
+  font-size: 8.5px;
+}
+
+.pc3-receipt-line.is-total {
+  padding-top: 4px;
 }
 
 .pc3-device {
@@ -34,8 +51,8 @@
 }
 
 .pc3-receipt::after {
-  height: 12px;
-  background: linear-gradient(180deg, transparent, rgba(0,0,0,.025));
+  height: 8px;
+  background: linear-gradient(180deg, transparent, rgba(0,0,0,.02));
 }
 
 /* Display: cleaner financial typography, less retro / neon. */
@@ -62,12 +79,19 @@
 
 @media (max-width: 639px) {
   .pc3-scene {
-    padding-top: 80px;
+    padding-top: 82px;
   }
 
   .pc3-receipt {
-    top: -48px;
-    width: 62%;
-    height: 112px;
+    /* 96px paper + -81px top = same 15px slot insertion. */
+    top: -81px;
+    width: 60%;
+    height: 96px;
+    padding: 10px 11px 12px;
+  }
+
+  .pc3-receipt-lines {
+    height: 51px;
+    font-size: 7.5px;
   }
 }
