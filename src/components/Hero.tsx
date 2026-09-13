@@ -55,6 +55,7 @@ export const Hero = () => {
 
   useGSAP(() => {
     const isDesktop = window.innerWidth > 1024;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let startX = 0;
 
     if (isDesktop && calcWrapperRef.current) {
@@ -68,14 +69,23 @@ export const Hero = () => {
     const storyPanels = gsap.utils.toArray<HTMLElement>('.story-panel');
     const storySymbols = gsap.utils.toArray<HTMLElement>('.story-symbol');
 
-    gsap.set(calcWrapperRef.current, {
-      scale: 0.8,
-      rotationY: 15,
-      rotationX: 10,
-      y: 50,
-      x: startX,
-      opacity: 0,
-    });
+    if (reduceMotion) {
+      gsap.set(calcWrapperRef.current, { x: 0, y: 0, scale: 1, rotationX: 0, rotationY: 0, rotationZ: 0, opacity: 1 });
+      gsap.set(heroCopyRef.current, { autoAlpha: 1, y: 0 });
+      gsap.set(headlineChildren, { y: 0, opacity: 1 });
+      gsap.set(subtextRef.current, { y: 0, opacity: 1 });
+      gsap.set(eyebrowRef.current, { y: 0, opacity: 1 });
+      gsap.set(actionsRef.current, { y: 0, opacity: 1 });
+      gsap.set(storyPanels, { autoAlpha: 0, y: 0 });
+      gsap.set(storySymbols, { autoAlpha: 0 });
+      finishIntroRef.current = () => undefined;
+      setIsInteractive(true);
+      return () => {
+        finishIntroRef.current = () => undefined;
+      };
+    }
+
+    gsap.set(calcWrapperRef.current, { scale: 0.8, rotationY: 15, rotationX: 10, y: 50, x: startX, opacity: 0 });
     gsap.set(headlineChildren, { y: 100, opacity: 0 });
     gsap.set(subtextRef.current, { y: 20, opacity: 0 });
     gsap.set(eyebrowRef.current, { y: 18, opacity: 0 });
@@ -87,14 +97,7 @@ export const Hero = () => {
       const intro = introTimelineRef.current;
       if (!intro || intro.progress() >= 1) return;
       intro.kill();
-      gsap.set(calcWrapperRef.current, {
-        x: 0,
-        y: 0,
-        scale: 1,
-        rotationX: 0,
-        rotationY: 0,
-        opacity: 1,
-      });
+      gsap.set(calcWrapperRef.current, { x: 0, y: 0, scale: 1, rotationX: 0, rotationY: 0, opacity: 1 });
       gsap.set(headlineChildren, { y: 0, opacity: 1 });
       gsap.set(subtextRef.current, { y: 0, opacity: 1 });
       gsap.set(eyebrowRef.current, { y: 0, opacity: 1 });
@@ -103,22 +106,12 @@ export const Hero = () => {
 
     finishIntroRef.current = finishIntro;
 
-    const intro = gsap.timeline({
-      onComplete: () => setIsInteractive(true),
-    });
+    const intro = gsap.timeline({ onComplete: () => setIsInteractive(true) });
     introTimelineRef.current = intro;
 
-    intro.to(calcWrapperRef.current, {
-      scale: 1.1,
-      rotationY: 5,
-      rotationX: 5,
-      y: 0,
-      opacity: 1,
-      duration: 1.2,
-      ease: 'power3.out',
-    }, 0);
+    intro.to(calcWrapperRef.current, { scale: 1.1, rotationY: 5, rotationX: 5, y: 0, opacity: 1, duration: 1.2, ease: 'power3.out' }, 0);
 
-    const typeSequence = [
+    [
       { t: 1.0, k: '4' },
       { t: 1.1, k: '8' },
       { t: 1.2, k: '2' },
@@ -129,49 +122,15 @@ export const Hero = () => {
       { t: 2.3, k: '5' },
       { t: 2.8, k: '=' },
       { t: 3.2, k: 'VAT+' },
-    ];
-
-    typeSequence.forEach(({ t: at, k }) => {
+    ].forEach(({ t: at, k }) => {
       intro.call(() => calcRef.current?.simulatePress(k), undefined, at);
     });
 
-    intro.to(headlineChildren, {
-      y: 0,
-      opacity: 1,
-      stagger: 0.1,
-      duration: 0.8,
-      ease: 'back.out(1.7)',
-    }, 4.2);
-
-    intro.to(subtextRef.current, {
-      y: 0,
-      opacity: 1,
-      duration: 0.5,
-      ease: 'power2.out',
-    }, 4.5);
-
-    intro.to(eyebrowRef.current, {
-      y: 0,
-      opacity: 1,
-      duration: 0.45,
-      ease: 'power2.out',
-    }, 4.7);
-
-    intro.to(actionsRef.current, {
-      y: 0,
-      opacity: 1,
-      duration: 0.5,
-      ease: 'power2.out',
-    }, 4.9);
-
-    intro.to(calcWrapperRef.current, {
-      x: 0,
-      rotationY: 0,
-      rotationX: 0,
-      scale: 1,
-      duration: 1.2,
-      ease: 'power3.inOut',
-    }, 5.3);
+    intro.to(headlineChildren, { y: 0, opacity: 1, stagger: 0.1, duration: 0.8, ease: 'back.out(1.7)' }, 4.2);
+    intro.to(subtextRef.current, { y: 0, opacity: 1, duration: 0.5, ease: 'power2.out' }, 4.5);
+    intro.to(eyebrowRef.current, { y: 0, opacity: 1, duration: 0.45, ease: 'power2.out' }, 4.7);
+    intro.to(actionsRef.current, { y: 0, opacity: 1, duration: 0.5, ease: 'power2.out' }, 4.9);
+    intro.to(calcWrapperRef.current, { x: 0, rotationY: 0, rotationX: 0, scale: 1, duration: 1.2, ease: 'power3.inOut' }, 5.3);
 
     const storyTimeline = gsap.timeline({
       scrollTrigger: {
@@ -189,63 +148,24 @@ export const Hero = () => {
       },
     });
 
-    storyTimeline.to(heroCopyRef.current, {
-      autoAlpha: 0,
-      y: -50,
-      duration: 0.55,
-      ease: 'power2.inOut',
-    }, 0.45);
+    storyTimeline.to(heroCopyRef.current, { autoAlpha: 0, y: -50, duration: 0.55, ease: 'power2.inOut' }, 0.45);
 
     storySteps.forEach((_, index) => {
       const panel = storyPanels[index];
       const symbol = storySymbols[index];
       const start = 1 + index * 1.25;
 
-      storyTimeline.to(panel, {
-        autoAlpha: 1,
-        y: 0,
-        duration: 0.35,
-        ease: 'power2.out',
-      }, start);
-
-      storyTimeline.to(symbol, {
-        autoAlpha: 0.18,
-        scale: 1,
-        rotation: index % 2 === 0 ? 6 : -6,
-        duration: 0.45,
-        ease: 'back.out(1.4)',
-      }, start);
-
-      storyTimeline.to(calcWrapperRef.current, {
-        y: index % 2 === 0 ? -10 : 10,
-        rotationZ: index % 2 === 0 ? -1.2 : 1.2,
-        duration: 0.55,
-        ease: 'power2.inOut',
-      }, start + 0.1);
+      storyTimeline.to(panel, { autoAlpha: 1, y: 0, duration: 0.35, ease: 'power2.out' }, start);
+      storyTimeline.to(symbol, { autoAlpha: 0.18, scale: 1, rotation: index % 2 === 0 ? 6 : -6, duration: 0.45, ease: 'back.out(1.4)' }, start);
+      storyTimeline.to(calcWrapperRef.current, { y: index % 2 === 0 ? -10 : 10, rotationZ: index % 2 === 0 ? -1.2 : 1.2, duration: 0.55, ease: 'power2.inOut' }, start + 0.1);
 
       if (index < storySteps.length - 1) {
-        storyTimeline.to(panel, {
-          autoAlpha: 0,
-          y: -34,
-          duration: 0.3,
-          ease: 'power2.in',
-        }, start + 0.92);
-
-        storyTimeline.to(symbol, {
-          autoAlpha: 0,
-          scale: 1.25,
-          duration: 0.3,
-          ease: 'power2.in',
-        }, start + 0.92);
+        storyTimeline.to(panel, { autoAlpha: 0, y: -34, duration: 0.3, ease: 'power2.in' }, start + 0.92);
+        storyTimeline.to(symbol, { autoAlpha: 0, scale: 1.25, duration: 0.3, ease: 'power2.in' }, start + 0.92);
       }
     });
 
-    storyTimeline.to(calcWrapperRef.current, {
-      y: 0,
-      rotationZ: 0,
-      duration: 0.5,
-      ease: 'power2.out',
-    }, 5.7);
+    storyTimeline.to(calcWrapperRef.current, { y: 0, rotationZ: 0, duration: 0.5, ease: 'power2.out' }, 5.7);
 
     return () => {
       finishIntroRef.current = () => undefined;
@@ -253,7 +173,7 @@ export const Hero = () => {
   }, { scope: container, dependencies: [language] });
 
   return (
-    <section ref={container} className="relative min-h-[520svh] bg-deep-ink text-warm-paper">
+    <section ref={container} className="relative min-h-[520svh] motion-reduce:min-h-[100svh] bg-deep-ink text-warm-paper">
       <div className="sticky top-0 min-h-[100svh] h-[100svh] w-full overflow-hidden px-6 md:px-12 pt-24 pb-8 flex items-center">
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute top-[16%] left-[8%] text-9xl font-mono text-acid-lime opacity-[0.06] rotate-12 blur-sm">%</div>
@@ -274,20 +194,14 @@ export const Hero = () => {
                 <span className="block text-fruitz-purple">{t('hero.t3')}</span>
               </h1>
 
-              <p ref={subtextRef} className="text-lg md:text-xl text-warm-paper/70 max-w-md">
-                {t('hero.desc')}
-              </p>
+              <p ref={subtextRef} className="text-lg md:text-xl text-warm-paper/70 max-w-md">{t('hero.desc')}</p>
 
               <div ref={actionsRef} className="flex flex-wrap gap-4 mt-2">
                 <Magnetic>
-                  <a href="#contact" className="bg-acid-lime text-deep-ink px-8 py-4 rounded-full font-bold hover:bg-white transition-colors uppercase tracking-widest text-sm inline-block">
-                    {t('hero.cta1')}
-                  </a>
+                  <a href="#contact" className="bg-acid-lime text-deep-ink px-8 py-4 rounded-full font-bold hover:bg-white transition-colors uppercase tracking-widest text-sm inline-block">{t('hero.cta1')}</a>
                 </Magnetic>
                 <Magnetic>
-                  <a href="#services" className="bg-transparent border border-white/20 px-8 py-4 rounded-full font-bold hover:bg-white/5 transition-colors uppercase tracking-widest text-sm inline-block">
-                    {t('hero.cta2')}
-                  </a>
+                  <a href="#services" className="bg-transparent border border-white/20 px-8 py-4 rounded-full font-bold hover:bg-white/5 transition-colors uppercase tracking-widest text-sm inline-block">{t('hero.cta2')}</a>
                 </Magnetic>
               </div>
             </div>
@@ -299,30 +213,20 @@ export const Hero = () => {
                   <span className="h-px w-12 bg-white/20" />
                   <span className="font-mono text-xs uppercase tracking-[0.24em] text-white/55">{step.kicker}</span>
                 </div>
-                <h2 className="font-display text-5xl sm:text-6xl lg:text-7xl leading-[0.92] tracking-tight max-w-xl">
-                  {step.title}
-                </h2>
-                <p className="mt-6 text-base md:text-xl text-white/60 max-w-lg leading-relaxed">
-                  {step.description}
-                </p>
+                <h2 className="font-display text-5xl sm:text-6xl lg:text-7xl leading-[0.92] tracking-tight max-w-xl">{step.title}</h2>
+                <p className="mt-6 text-base md:text-xl text-white/60 max-w-lg leading-relaxed">{step.description}</p>
                 <div className="mt-8 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.25em] text-white/30">
                   <span>{storyCopy.live}</span>
                   <span className="w-2 h-2 rounded-full bg-acid-lime animate-pulse" />
                 </div>
-                <div className={`story-symbol absolute -right-4 lg:-right-12 top-1/2 -translate-y-1/2 text-[11rem] lg:text-[17rem] font-display font-black leading-none ${step.accent}`}>
-                  {step.symbol}
-                </div>
+                <div className={`story-symbol absolute -right-4 lg:-right-12 top-1/2 -translate-y-1/2 text-[11rem] lg:text-[17rem] font-display font-black leading-none ${step.accent}`}>{step.symbol}</div>
               </div>
             ))}
           </div>
 
           <div className="order-1 lg:order-2 flex justify-center lg:justify-end perspective-1000 pl-4 pr-4 lg:pr-8">
             <div ref={calcWrapperRef} className="w-full max-w-[300px] will-change-transform">
-              <Calculator
-                ref={calcRef}
-                isInteractive={isInteractive}
-                onInteract={takeControl}
-              />
+              <Calculator ref={calcRef} isInteractive={isInteractive} onInteract={takeControl} />
               <div className="mt-6 flex items-center justify-center gap-3 font-mono text-[10px] uppercase tracking-[0.22em] text-white/30">
                 <span>{isInteractive ? storyCopy.calculatorReady : storyCopy.calculatorRunning}</span>
                 <span className={`w-1.5 h-1.5 rounded-full ${isInteractive ? 'bg-acid-lime' : 'bg-coral animate-pulse'}`} />
@@ -331,7 +235,7 @@ export const Hero = () => {
           </div>
         </div>
 
-        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center gap-2 pointer-events-none">
+        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 hidden md:flex motion-reduce:hidden flex-col items-center gap-2 pointer-events-none">
           <span className="font-mono text-[9px] uppercase tracking-[0.35em] text-white/25">{storyCopy.scroll}</span>
           <span className="h-8 w-px bg-gradient-to-b from-white/30 to-transparent" />
         </div>

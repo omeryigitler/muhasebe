@@ -50,6 +50,8 @@ export const Services = () => {
   }));
 
   useGSAP(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
     const rows = gsap.utils.toArray<HTMLElement>('.service-row');
     rows.forEach((row, index) => {
       const direction = index % 2 === 0 ? -1 : 1;
@@ -81,35 +83,19 @@ export const Services = () => {
 
         <div className="border-t border-deep-ink/20">
           {services.map((service) => (
-            <article
-              key={service.id}
-              className="service-row group relative border-b border-deep-ink/20 overflow-hidden"
-            >
+            <article key={service.id} className="service-row group relative border-b border-deep-ink/20 overflow-hidden">
               <div className={`absolute inset-0 ${service.accent} translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(.2,.8,.2,1)]`} />
 
               <div className={`relative z-10 grid grid-cols-[52px_1fr_auto] md:grid-cols-[80px_1.25fr_1fr_100px] gap-4 md:gap-8 items-center py-8 md:py-10 px-2 md:px-4 transition-colors duration-300 ${service.hoverText}`}>
-                <span className="font-mono text-xs md:text-sm opacity-45 group-hover:opacity-80 transition-opacity">
-                  {service.id}
-                </span>
-
-                <h3 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-none tracking-tight">
-                  {service.title}
-                </h3>
-
-                <p className="hidden md:block text-sm lg:text-base leading-relaxed max-w-md opacity-55 group-hover:opacity-80 transition-opacity">
-                  {service.description}
-                </p>
-
+                <span className="font-mono text-xs md:text-sm opacity-45 group-hover:opacity-80 transition-opacity">{service.id}</span>
+                <h3 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-none tracking-tight">{service.title}</h3>
+                <p className="hidden md:block text-sm lg:text-base leading-relaxed max-w-md opacity-55 group-hover:opacity-80 transition-opacity">{service.description}</p>
                 <div className="justify-self-end overflow-hidden w-12 h-12 md:w-16 md:h-16 flex items-center justify-center">
-                  <span className="font-display text-5xl md:text-7xl leading-none transition-transform duration-500 group-hover:rotate-12 group-hover:scale-125">
-                    {service.symbol}
-                  </span>
+                  <span className="font-display text-5xl md:text-7xl leading-none transition-transform duration-500 group-hover:rotate-12 group-hover:scale-125">{service.symbol}</span>
                 </div>
               </div>
 
-              <p className="relative z-10 md:hidden pb-7 px-[68px] text-sm leading-relaxed opacity-55 group-hover:opacity-80 transition-opacity">
-                {service.description}
-              </p>
+              <p className="relative z-10 md:hidden pb-7 px-[68px] text-sm leading-relaxed opacity-55 group-hover:opacity-80 transition-opacity">{service.description}</p>
             </article>
           ))}
         </div>

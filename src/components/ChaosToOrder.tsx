@@ -30,6 +30,13 @@ export const ChaosToOrder = () => {
     const ledgerRows = gsap.utils.toArray<HTMLElement>('.ledger-row');
     const rules = gsap.utils.toArray<HTMLElement>('.ledger-rule');
 
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      gsap.set(ledgerRows, { clearProps: 'transform,opacity' });
+      gsap.set(rules, { scaleX: 1, transformOrigin: 'left center' });
+      gsap.set('.ledger-header, .ledger-total', { autoAlpha: 1, y: 0 });
+      return;
+    }
+
     ledgerRows.forEach((row) => {
       gsap.set(row, {
         x: gsap.utils.random(-260, 260),
@@ -63,25 +70,9 @@ export const ChaosToOrder = () => {
       }, index * 0.08);
     });
 
-    timeline.to(rules, {
-      scaleX: 1,
-      stagger: 0.05,
-      duration: 0.45,
-      ease: 'power2.out',
-    }, 0.35);
-
-    timeline.to('.ledger-header', {
-      autoAlpha: 1,
-      y: 0,
-      duration: 0.35,
-    }, 0.55);
-
-    timeline.to('.ledger-total', {
-      autoAlpha: 1,
-      y: 0,
-      duration: 0.45,
-      ease: 'back.out(1.4)',
-    }, 0.72);
+    timeline.to(rules, { scaleX: 1, stagger: 0.05, duration: 0.45, ease: 'power2.out' }, 0.35);
+    timeline.to('.ledger-header', { autoAlpha: 1, y: 0, duration: 0.35 }, 0.55);
+    timeline.to('.ledger-total', { autoAlpha: 1, y: 0, duration: 0.45, ease: 'back.out(1.4)' }, 0.72);
   }, { scope: container, dependencies: [language] });
 
   return (
@@ -94,13 +85,8 @@ export const ChaosToOrder = () => {
       <div className="max-w-6xl mx-auto w-full relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-[0.9fr_1.4fr] gap-10 lg:gap-20 items-end mb-20">
           <div>
-            <p className="font-mono text-xs uppercase tracking-[0.3em] text-acid-lime mb-5">
-              {language === 'tr' ? 'Evraktan sisteme' : 'From paperwork to system'}
-            </p>
-            <h2 className="font-display text-5xl md:text-7xl leading-[0.94]">
-              {t('chaos.t1')}<br />
-              <span className="text-acid-lime">{t('chaos.t2')}</span>
-            </h2>
+            <p className="font-mono text-xs uppercase tracking-[0.3em] text-acid-lime mb-5">{language === 'tr' ? 'Evraktan sisteme' : 'From paperwork to system'}</p>
+            <h2 className="font-display text-5xl md:text-7xl leading-[0.94]">{t('chaos.t1')}<br /><span className="text-acid-lime">{t('chaos.t2')}</span></h2>
           </div>
           <p className="text-lg md:text-xl text-white/55 max-w-xl lg:justify-self-end">
             {language === 'tr'
@@ -123,9 +109,7 @@ export const ChaosToOrder = () => {
                 <div className="ledger-row grid grid-cols-[1.2fr_0.8fr_auto] gap-4 items-center py-5 md:py-6 font-mono will-change-transform">
                   <span className="text-sm md:text-base text-white/80">{row[0]}</span>
                   <span className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-white/35">{row[1]}</span>
-                  <span className={`text-right text-base md:text-lg ${row[2].startsWith('+') ? 'text-acid-lime' : 'text-coral'}`}>
-                    {row[2]}
-                  </span>
+                  <span className={`text-right text-base md:text-lg ${row[2].startsWith('+') ? 'text-acid-lime' : 'text-coral'}`}>{row[2]}</span>
                 </div>
               </div>
             ))}
@@ -134,14 +118,10 @@ export const ChaosToOrder = () => {
           <div className="ledger-rule h-px bg-white/10" />
           <div className="ledger-total flex flex-col md:flex-row md:items-end justify-between gap-4 pt-7">
             <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-white/30 mb-2">
-                {language === 'tr' ? 'Net hareket' : 'Net movement'}
-              </p>
+              <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-white/30 mb-2">{language === 'tr' ? 'Net hareket' : 'Net movement'}</p>
               <p className="font-display text-4xl md:text-6xl text-acid-lime">+₺14.750</p>
             </div>
-            <p className="font-mono text-xs text-white/35 max-w-xs md:text-right">
-              {language === 'tr' ? '5 belge → 5 sınıflandırılmış kayıt → 1 okunabilir sonuç' : '5 documents → 5 classified entries → 1 readable result'}
-            </p>
+            <p className="font-mono text-xs text-white/35 max-w-xs md:text-right">{language === 'tr' ? '5 belge → 5 sınıflandırılmış kayıt → 1 okunabilir sonuç' : '5 documents → 5 classified entries → 1 readable result'}</p>
           </div>
         </div>
       </div>
