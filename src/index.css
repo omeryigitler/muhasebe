@@ -1,34 +1,5 @@
 @import "tailwindcss";
 
-@font-face {
-  font-family: "Sayisal Display";
-  src: url("https://raw.githubusercontent.com/google/fonts/main/ofl/baloo2/Baloo2%5Bwght%5D.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 400 800;
-  font-display: swap;
-  size-adjust: 94%;
-  unicode-range: U+015E-015F;
-}
-
-@font-face {
-  font-family: "Sayisal Display";
-  src: url("https://raw.githubusercontent.com/google/fonts/main/ofl/nunito/Nunito%5Bwght%5D.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 200 1000;
-  font-display: swap;
-  unicode-range: U+00C7, U+00D6, U+00DC, U+00E7, U+00F6, U+00FC, U+011E-011F, U+0130-0131;
-}
-
-@font-face {
-  font-family: "Sayisal Display";
-  src: url("https://raw.githubusercontent.com/google/fonts/main/ofl/fredoka/Fredoka%5Bwdth%2Cwght%5D.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 300 700;
-  font-stretch: 75% 125%;
-  font-display: swap;
-  unicode-range: U+0000-00C6, U+00C8-00D5, U+00D7-00DB, U+00DD-00E6, U+00E8-00F5, U+00F7-00FB, U+00FD-011D, U+0120-012F, U+0132-015D, U+0160-10FFFF;
-}
-
 @theme {
   --color-deep-ink: #101114;
   --color-warm-paper: #F5F1E8;
@@ -37,7 +8,7 @@
   --color-coral: #FF6654;
   --color-vivid-purple: #9A6AFF;
 
-  --font-display: "Sayisal Display", sans-serif;
+  --font-display: "Fredoka", sans-serif;
   --font-body: "DM Sans", sans-serif;
   --font-mono: "IBM Plex Mono", monospace;
   --font-playful: "Bowlby One SC", sans-serif;
@@ -47,6 +18,14 @@
   html {
     scroll-behavior: smooth;
     color-scheme: dark;
+  }
+
+  html[lang="tr"] {
+    --font-display: "Lilita One", sans-serif;
+  }
+
+  html[lang="en"] {
+    --font-display: "Fredoka", sans-serif;
   }
 
   body {
@@ -62,10 +41,28 @@
     font-weight: 700;
   }
 
+  html[lang="tr"] h1,
+  html[lang="tr"] h2,
+  html[lang="tr"] h3,
+  html[lang="tr"] h4,
+  html[lang="tr"] h5,
+  html[lang="tr"] h6 {
+    font-weight: 400;
+  }
+
   :focus-visible {
     outline: 2px solid var(--color-acid-lime);
     outline-offset: 4px;
   }
+}
+
+html[lang="tr"] .font-display {
+  font-family: "Lilita One", sans-serif;
+  font-weight: 400;
+}
+
+html[lang="en"] .font-display {
+  font-family: "Fredoka", sans-serif;
 }
 
 .text-fruitz-lime {
