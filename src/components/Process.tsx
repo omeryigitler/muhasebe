@@ -35,7 +35,7 @@ export const Process = () => {
       text: t('process.s3.d'),
       color: 'bg-coral text-deep-ink',
       subtle: 'text-deep-ink/55 border-deep-ink/15 bg-deep-ink/[0.045]',
-      icon: '→',
+      icon: '›',
       label: language === 'tr' ? 'Plan' : 'Plan',
     },
     {
@@ -115,7 +115,7 @@ export const Process = () => {
                 </div>
 
                 <div className={`w-20 h-20 md:w-28 md:h-28 rounded-full border flex items-center justify-center ${step.subtle}`}>
-                  <span className="font-display text-4xl md:text-6xl leading-none" aria-hidden="true">{step.icon}</span>
+                  <span className="font-display font-bold text-5xl md:text-7xl leading-none" aria-hidden="true">{step.icon}</span>
                 </div>
               </div>
             </article>
