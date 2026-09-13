@@ -77,7 +77,7 @@ export const KineticMarquee = () => {
 
       <div
         ref={topTrack}
-        className="whitespace-nowrap font-body font-black text-6xl md:text-8xl lg:text-[8.5rem] leading-[0.9] tracking-[-0.055em] text-acid-lime will-change-transform"
+        className="whitespace-nowrap font-playful text-6xl md:text-8xl lg:text-[8.2rem] leading-[0.92] tracking-[-0.035em] text-acid-lime will-change-transform"
         style={{ width: '240%', transformOrigin: 'center' }}
       >
         {text.repeat(5)}
@@ -85,7 +85,7 @@ export const KineticMarquee = () => {
 
       <div
         ref={bottomTrack}
-        className="mt-4 md:mt-7 whitespace-nowrap font-body font-black text-5xl md:text-7xl lg:text-[7.6rem] leading-[0.9] tracking-[-0.055em] text-transparent opacity-40 will-change-transform"
+        className="mt-4 md:mt-7 whitespace-nowrap font-playful text-5xl md:text-7xl lg:text-[7.3rem] leading-[0.92] tracking-[-0.035em] text-transparent opacity-40 will-change-transform"
         style={{ width: '240%', WebkitTextStroke: '1px rgba(245,241,232,0.38)' }}
       >
         {text.repeat(5)}
