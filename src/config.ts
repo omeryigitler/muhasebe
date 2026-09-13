@@ -20,7 +20,6 @@ export const APP_CONFIG = {
   tagline: 'Muhasebe, Ama Biraz Daha Canlı.',
   email: 'hello@sayisal.co',
   location: 'İstanbul, TR',
-  currency: '₺',
   vatRate: 20,
   taxScenarioRate: 20,
   simulator: {
