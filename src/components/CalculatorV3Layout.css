@@ -1,0 +1,13 @@
+.pc3-scene {
+  width: min(430px, 134%) !important;
+  max-width: 430px !important;
+  margin-left: 50% !important;
+  margin-right: 0 !important;
+  transform: translateX(-50%);
+}
+
+@media (max-width: 639px) {
+  .pc3-scene {
+    width: min(340px, 132%) !important;
+  }
+}
