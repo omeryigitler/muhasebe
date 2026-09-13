@@ -36,21 +36,21 @@ export const Contact = () => {
   const messageInput = `${inputBase} hover:border-coral focus-visible:border-coral hover:shadow-[7px_7px_0_#FF6654] focus-visible:shadow-[7px_7px_0_#FF6654] resize-none`;
 
   return (
-    <section id="contact" className="bg-deep-ink text-warm-paper py-32 px-4 relative overflow-hidden">
-      <div className="max-w-7xl mx-auto mb-28 text-center relative z-10">
-        <h2 className="text-6xl md:text-[8rem] leading-[0.88] font-display mb-8 tracking-tight">
+    <section id="contact" className="bg-deep-ink text-warm-paper py-20 md:py-32 px-4 relative overflow-hidden">
+      <div className="max-w-7xl mx-auto mb-16 md:mb-28 text-center relative z-10">
+        <h2 className="text-5xl md:text-[8rem] leading-[0.88] font-display mb-6 md:mb-8 tracking-tight">
           {t('contact.t1')}<br />
           <span className="text-acid-lime">{t('contact.t2')}</span>
         </h2>
-        <p className="text-xl md:text-3xl opacity-80 font-mono">
+        <p className="text-base md:text-3xl opacity-80 font-mono">
           {t('contact.desc')}
         </p>
       </div>
 
-      <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-[0.8fr_1.2fr] gap-12 md:gap-20 relative z-10">
+      <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-[0.8fr_1.2fr] gap-10 md:gap-20 relative z-10">
         <div>
-          <h3 className="text-3xl font-display mb-8">{t('contact.meet')}</h3>
-          <div className="space-y-6 font-mono text-base md:text-lg text-white/70">
+          <h3 className="text-2xl md:text-3xl font-display mb-6 md:mb-8">{t('contact.meet')}</h3>
+          <div className="space-y-5 md:space-y-6 font-mono text-sm md:text-lg text-white/70">
             <p>
               Email:<br />
               <a href={`mailto:${APP_CONFIG.email}`} className="text-electric-blue hover:text-white transition-colors underline underline-offset-4 decoration-white/20">
@@ -61,7 +61,7 @@ export const Contact = () => {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6" aria-describedby="contact-form-note">
+        <form onSubmit={handleSubmit} className="space-y-5 md:space-y-6" aria-describedby="contact-form-note">
           <div>
             <label htmlFor="contact-name" className="block font-mono text-xs opacity-60 mb-2 uppercase">{t('contact.form.name')}</label>
             <input id="contact-name" required type="text" value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" className={nameInput} />
