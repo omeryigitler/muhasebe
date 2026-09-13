@@ -2,74 +2,115 @@ import React, { useRef } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { cn } from '../utils/cn';
 import { useLanguage } from '../context/LanguageContext';
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 export const Services = () => {
-  const { t } = useLanguage();
-  const container = useRef<HTMLDivElement>(null);
+  const { t, language } = useLanguage();
+  const container = useRef<HTMLElement>(null);
 
-  const services = [
-    { id: '01', title: t('services.01'), color: 'bg-electric-blue text-white', span: 'col-span-1 md:col-span-2 md:row-span-2' },
-    { id: '02', title: t('services.02'), color: 'bg-acid-lime text-deep-ink', span: 'col-span-1' },
-    { id: '03', title: t('services.03'), color: 'bg-coral text-deep-ink', span: 'col-span-1' },
-    { id: '04', title: t('services.04'), color: 'bg-[#1A1C21] text-warm-paper', span: 'col-span-1 md:col-span-2' },
-    { id: '05', title: t('services.05'), color: 'bg-[#FF90E8] text-deep-ink', span: 'col-span-1 md:row-span-2' },
-    { id: '06', title: t('services.06'), color: 'bg-[#00E5FF] text-deep-ink', span: 'col-span-1' },
+  const details = language === 'tr'
+    ? [
+        'Günlük kayıtlar, banka hareketleri ve düzenli defter akışı.',
+        'KDV takibi, beyan dönemleri ve vergi görünürlüğü.',
+        'Maaş, kesinti ve ödeme sürecinin tek takvimde yönetimi.',
+        'Kuruluş sürecinden ilk finansal düzene kadar temiz başlangıç.',
+        'Toplamları değil, değişimin nedenini gösteren yönetim görünümü.',
+        'Karar vermeden önce rakamların ne söylediğini birlikte okuma.',
+      ]
+    : [
+        'Daily entries, bank movements, and a bookkeeping flow that stays clean.',
+        'VAT tracking, filing periods, and tax visibility before deadlines.',
+        'Payroll, deductions, and payment timing managed on one clear timeline.',
+        'A clean financial setup from incorporation through the first reporting cycle.',
+        'Management reporting that explains the movement, not only the total.',
+        'Advisory that turns accounting information into a decision you can use.',
+      ];
+
+  const accents = [
+    'bg-electric-blue text-white',
+    'bg-acid-lime text-deep-ink',
+    'bg-coral text-deep-ink',
+    'bg-vivid-purple text-white',
+    'bg-[#FF90E8] text-deep-ink',
+    'bg-[#00E5FF] text-deep-ink',
   ];
 
+  const symbols = ['+', '%', '€', '→', '=', '?'];
+  const hoverText = ['group-hover:text-white', 'group-hover:text-deep-ink', 'group-hover:text-deep-ink', 'group-hover:text-white', 'group-hover:text-deep-ink', 'group-hover:text-deep-ink'];
+
+  const services = Array.from({ length: 6 }, (_, index) => ({
+    id: String(index + 1).padStart(2, '0'),
+    title: t(`services.0${index + 1}`),
+    description: details[index],
+    accent: accents[index],
+    symbol: symbols[index],
+    hoverText: hoverText[index],
+  }));
+
   useGSAP(() => {
-    const cards = gsap.utils.toArray('.service-card') as HTMLElement[];
-    
-    cards.forEach((card, i) => {
-      gsap.from(card, {
+    const rows = gsap.utils.toArray<HTMLElement>('.service-row');
+    rows.forEach((row, index) => {
+      const direction = index % 2 === 0 ? -1 : 1;
+      gsap.from(row, {
+        x: 70 * direction,
+        opacity: 0,
+        duration: 0.9,
+        ease: 'power3.out',
         scrollTrigger: {
-          trigger: card,
-          start: 'top bottom-=100',
+          trigger: row,
+          start: 'top 88%',
           toggleActions: 'play none none reverse',
         },
-        y: 50,
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power3.out',
-        delay: (i % 3) * 0.1
       });
     });
-  }, { scope: container });
+  }, { scope: container, dependencies: [language] });
 
   return (
-    <section id="services" ref={container} className="py-24 px-4 md:px-8 bg-warm-paper text-deep-ink">
+    <section id="services" ref={container} className="bg-warm-paper text-deep-ink py-28 px-4 md:px-8 overflow-hidden">
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-4xl md:text-6xl font-display mb-16 max-w-2xl leading-tight">
-          {t('services.title')}
-        </h2>
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.5fr] gap-8 lg:gap-20 mb-20 items-end">
+          <p className="font-mono text-xs uppercase tracking-[0.32em] text-deep-ink/45">
+            {language === 'tr' ? 'Ne yapıyoruz' : 'What we do'}
+          </p>
+          <h2 className="font-display text-5xl md:text-7xl lg:text-8xl leading-[0.9] tracking-tight max-w-4xl">
+            {t('services.title')}
+          </h2>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-[200px]">
-          {services.map((s) => (
-            <div 
-              key={s.id} 
-              className={cn(
-                "service-card group relative p-6 rounded-2xl overflow-hidden flex flex-col justify-between transition-all duration-500 ease-out hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] border border-transparent hover:border-white/20",
-                s.color,
-                s.span
-              )}
+        <div className="border-t border-deep-ink/20">
+          {services.map((service) => (
+            <article
+              key={service.id}
+              className="service-row group relative border-b border-deep-ink/20 overflow-hidden"
             >
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              
-              <div className="absolute top-0 right-0 p-6 opacity-20 font-mono text-8xl -translate-y-4 translate-x-4 group-hover:scale-110 group-hover:opacity-30 transition-all duration-500">
-                {['+','-','×','÷','%','='][parseInt(s.id)-1]}
+              <div className={`absolute inset-0 ${service.accent} translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(.2,.8,.2,1)]`} />
+
+              <div className={`relative z-10 grid grid-cols-[52px_1fr_auto] md:grid-cols-[80px_1.25fr_1fr_100px] gap-4 md:gap-8 items-center py-8 md:py-10 px-2 md:px-4 transition-colors duration-300 ${service.hoverText}`}>
+                <span className="font-mono text-xs md:text-sm opacity-45 group-hover:opacity-80 transition-opacity">
+                  {service.id}
+                </span>
+
+                <h3 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-none tracking-tight">
+                  {service.title}
+                </h3>
+
+                <p className="hidden md:block text-sm lg:text-base leading-relaxed max-w-md opacity-55 group-hover:opacity-80 transition-opacity">
+                  {service.description}
+                </p>
+
+                <div className="justify-self-end overflow-hidden w-12 h-12 md:w-16 md:h-16 flex items-center justify-center">
+                  <span className="font-display text-5xl md:text-7xl leading-none transition-transform duration-500 group-hover:rotate-12 group-hover:scale-125">
+                    {service.symbol}
+                  </span>
+                </div>
               </div>
-              
-              <div className="font-mono text-xl opacity-70 transition-transform duration-500 group-hover:scale-110 origin-top-left relative z-10">
-                {s.id}
-              </div>
-              
-              <h3 className="text-3xl font-display mt-auto transition-transform duration-500 group-hover:translate-x-2 relative z-10">
-                {s.title}
-              </h3>
-            </div>
+
+              <p className="relative z-10 md:hidden pb-7 px-[68px] text-sm leading-relaxed opacity-55 group-hover:opacity-80 transition-opacity">
+                {service.description}
+              </p>
+            </article>
           ))}
         </div>
       </div>
