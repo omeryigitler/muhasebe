@@ -237,7 +237,11 @@
     height: 100% !important;
   }
 
-  /* Bottom copy is an opaque, independent stage. */
+  /*
+   * Keep the lower stage itself transparent during the intro. The actual
+   * deep-ink panel lives on the animated copy element, so it fades in only
+   * after the calculator has finished shrinking into the upper stage.
+   */
   #top > .sticky > .max-w-7xl > div:first-child {
     position: absolute !important;
     inset: auto 0 0 0 !important;
@@ -245,7 +249,7 @@
     width: 100% !important;
     min-height: 0 !important;
     z-index: 20 !important;
-    background: var(--color-deep-ink) !important;
+    background: transparent !important;
     isolation: isolate;
   }
 
@@ -254,9 +258,14 @@
     justify-content: center !important;
     gap: 12px !important;
     padding: 0 !important;
+    background: var(--color-deep-ink) !important;
   }
 
-  /* Top stage is calculator-only. GSAP controls the wrapper transform. */
+  /*
+   * Never clip the calculator during the shrink animation. The final scaled
+   * calculator already fits inside the upper stage, and the copy panel sits
+   * above it (z-index 20) once it fades in.
+   */
   #top > .sticky > .max-w-7xl > div:nth-child(2) {
     position: absolute !important;
     inset: 0 0 46% 0 !important;
@@ -266,6 +275,7 @@
     align-items: center !important;
     justify-content: center !important;
     padding: 0 !important;
+    overflow: visible !important;
   }
 
   #top > .sticky > .max-w-7xl > div:nth-child(2) > div {
