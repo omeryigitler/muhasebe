@@ -2,12 +2,14 @@ import React, { useRef, useState } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Calculator, type CalculatorHandle } from './Calculator';
+import { Calculator, type CalculatorDemoPreset, type CalculatorHandle } from './Calculator';
 import { useLanguage } from '../context/LanguageContext';
 import { Magnetic } from './Magnetic';
 import { getFinanceLocale } from '../config';
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
+
+const DEMO_PRESETS: CalculatorDemoPreset[] = ['bookkeeping', 'vat', 'payroll', 'reporting'];
 
 export const Hero = () => {
   const { t, language } = useLanguage();
@@ -22,6 +24,8 @@ export const Hero = () => {
   const actionsRef = useRef<HTMLDivElement>(null);
   const introTimelineRef = useRef<gsap.core.Timeline | null>(null);
   const finishIntroRef = useRef<() => void>(() => undefined);
+  const hasUserInteractedRef = useRef(false);
+  const lastDemoStepRef = useRef(-1);
   const [isInteractive, setIsInteractive] = useState(false);
 
   const storyCopy = language === 'tr' ? {
@@ -51,6 +55,7 @@ export const Hero = () => {
   const storySteps = storyCopy.steps;
 
   const takeControl = () => {
+    hasUserInteractedRef.current = true;
     finishIntroRef.current();
     setIsInteractive(true);
   };
@@ -111,7 +116,7 @@ export const Hero = () => {
     const intro = gsap.timeline({ onComplete: () => setIsInteractive(true) });
     introTimelineRef.current = intro;
 
-    intro.to(calcWrapperRef.current, { scale: 1.1, rotationY: 5, rotationX: 5, y: 0, opacity: 1, duration: 1.2, ease: 'power3.out' }, 0);
+    intro.to(calcWrapperRef.current, { scale: 1.08, rotationY: 5, rotationX: 5, y: 0, opacity: 1, duration: 1.2, ease: 'power3.out' }, 0);
 
     [
       { t: 1.0, k: '4' },
@@ -145,6 +150,13 @@ export const Hero = () => {
           if (self.progress > 0.012) {
             finishIntroRef.current();
             setIsInteractive(true);
+          }
+
+          if (hasUserInteractedRef.current || self.progress < 0.16) return;
+          const stepIndex = Math.min(3, Math.floor((self.progress - 0.16) / 0.2));
+          if (stepIndex >= 0 && stepIndex !== lastDemoStepRef.current) {
+            lastDemoStepRef.current = stepIndex;
+            calcRef.current?.setDemo(DEMO_PRESETS[stepIndex]);
           }
         },
       },
@@ -227,9 +239,9 @@ export const Hero = () => {
           </div>
 
           <div className="order-1 lg:order-2 flex justify-center lg:justify-end perspective-1000 px-2 lg:pl-4 lg:pr-8">
-            <div ref={calcWrapperRef} className="w-full max-w-[210px] min-[390px]:max-w-[225px] sm:max-w-[270px] lg:max-w-[300px] will-change-transform">
+            <div ref={calcWrapperRef} className="w-full max-w-[225px] sm:max-w-[285px] lg:max-w-[320px] will-change-transform">
               <Calculator ref={calcRef} isInteractive={isInteractive} onInteract={takeControl} />
-              <div className="mt-2 sm:mt-5 flex items-center justify-center gap-2 sm:gap-3 font-mono text-[8px] sm:text-[10px] uppercase tracking-[0.18em] sm:tracking-[0.22em] text-white/30">
+              <div className="mt-2 sm:mt-4 flex items-center justify-center gap-2 sm:gap-3 font-mono text-[8px] sm:text-[10px] uppercase tracking-[0.18em] sm:tracking-[0.22em] text-white/30">
                 <span>{isInteractive ? storyCopy.calculatorReady : storyCopy.calculatorRunning}</span>
                 <span className={`w-1.5 h-1.5 rounded-full ${isInteractive ? 'bg-acid-lime' : 'bg-coral animate-pulse'}`} />
               </div>
