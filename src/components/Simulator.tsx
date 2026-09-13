@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { APP_CONFIG } from '../config';
+import { APP_CONFIG, getFinanceLocale } from '../config';
 import { useLanguage } from '../context/LanguageContext';
 
 export const Simulator = () => {
   const { t, language } = useLanguage();
   const { simulator } = APP_CONFIG;
+  const finance = getFinanceLocale(language);
   const [revenue, setRevenue] = useState(50000);
   const [expenseRatio, setExpenseRatio] = useState(30);
   const [scenarioRate, setScenarioRate] = useState(APP_CONFIG.taxScenarioRate);
@@ -26,10 +27,13 @@ export const Simulator = () => {
       };
 
   const formatCurrency = (value: number) => {
-    const formatted = new Intl.NumberFormat(language === 'tr' ? 'tr-TR' : 'en-US', {
+    return new Intl.NumberFormat(finance.locale, {
+      style: 'currency',
+      currency: finance.code,
+      currencyDisplay: 'narrowSymbol',
+      minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(value);
-    return `${APP_CONFIG.currency}${formatted}`;
   };
 
   const sliderClass = 'w-full appearance-none bg-white/20 h-2 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-acid-lime focus-visible:ring-offset-4 focus-visible:ring-offset-electric-blue [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:bg-acid-lime [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer';
