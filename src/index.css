@@ -111,6 +111,96 @@ html[lang="en"] .font-display {
   -webkit-mask-image: linear-gradient(to top, black 80%, transparent 100%);
 }
 
+/* Experimental product-shot layer: realistic image first, live calculator underneath. */
+.calculator-root {
+  isolation: isolate;
+}
+
+.calculator-root::before {
+  content: "";
+  position: absolute;
+  z-index: 40;
+  left: 50%;
+  top: 43%;
+  width: min(188%, 590px);
+  aspect-ratio: 16 / 9;
+  pointer-events: none;
+  background: url('/realistic-calculator-hero.webp') center / contain no-repeat;
+  transform: translate(-50%, -50%) scale(0.9) rotate(-1.5deg);
+  transform-origin: 50% 58%;
+  opacity: 0;
+  filter:
+    saturate(1.12)
+    contrast(1.04)
+    drop-shadow(-28px 34px 34px rgba(82, 101, 255, 0.22))
+    drop-shadow(26px 24px 34px rgba(255, 102, 84, 0.18));
+  -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 58%, transparent 100%);
+  mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 58%, transparent 100%);
+  animation: realistic-product-intro 4.8s cubic-bezier(.2,.8,.2,1) both;
+}
+
+.calculator-root::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -34%;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 22% 62%, rgba(82, 101, 255, 0.34), transparent 34%),
+    radial-gradient(circle at 78% 28%, rgba(255, 102, 84, 0.28), transparent 32%),
+    radial-gradient(circle at 48% 82%, rgba(154, 106, 255, 0.24), transparent 30%),
+    radial-gradient(circle at 72% 74%, rgba(217, 255, 67, 0.14), transparent 24%);
+  filter: blur(28px);
+  opacity: 0.62;
+}
+
+.calculator-root:focus-within::before {
+  animation: none;
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+@keyframes realistic-product-intro {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -47%) scale(0.82) rotate(-3deg);
+    filter: saturate(1.02) contrast(1.02) blur(10px);
+  }
+  12% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(0.94) rotate(-1.5deg);
+    filter:
+      saturate(1.12)
+      contrast(1.04)
+      blur(0)
+      drop-shadow(-28px 34px 34px rgba(82, 101, 255, 0.22))
+      drop-shadow(26px 24px 34px rgba(255, 102, 84, 0.18));
+  }
+  68% {
+    opacity: 1;
+    transform: translate(-50%, -51%) scale(1) rotate(-0.5deg);
+  }
+  84% {
+    opacity: 0.78;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -53%) scale(1.08) rotate(0deg);
+  }
+}
+
+@media (max-width: 767px) {
+  .calculator-root::before {
+    top: 42%;
+    width: 154%;
+  }
+
+  .calculator-root::after {
+    inset: -20%;
+    opacity: 0.46;
+  }
+}
+
 @media (pointer: fine) {
   body.hide-cursor,
   body.hide-cursor * {
@@ -147,6 +237,10 @@ html[lang="en"] .font-display {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  .calculator-root::before {
+    display: none;
   }
 
   body,
