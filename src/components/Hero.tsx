@@ -86,22 +86,27 @@ export const Hero = () => {
       if (!stage || !wrapper || !copy) return;
 
       const scene = wrapper.querySelector<HTMLElement>('.physical-calc-scene');
-
-      gsap.set(stage, { top: 0, bottom: 0 });
-      gsap.set(wrapper, { clearProps: 'transform' });
-
-      const sceneRect = scene?.getBoundingClientRect();
-      const availableHeight = Math.max(220, window.innerHeight * 0.55 - 76);
-      const availableWidth = Math.max(260, window.innerWidth - 24);
-      const naturalHeight = sceneRect?.height || wrapper.getBoundingClientRect().height || 560;
-      const naturalWidth = sceneRect?.width || wrapper.getBoundingClientRect().width || 360;
-      const fitByHeight = availableHeight / naturalHeight;
-      const fitByWidth = availableWidth / naturalWidth;
-      const mobileFinalScale = Math.max(0.48, Math.min(0.66, fitByHeight, fitByWidth));
+      const naturalHeight = scene?.offsetHeight || wrapper.offsetHeight || 560;
+      const naturalWidth = scene?.offsetWidth || wrapper.offsetWidth || 360;
+      const stageHeight = Math.max(stage.clientHeight, window.innerHeight * 0.44);
+      const stageWidth = Math.max(stage.clientWidth, window.innerWidth - 32);
+      const fitByHeight = (stageHeight - 8) / naturalHeight;
+      const fitByWidth = (stageWidth - 12) / naturalWidth;
+      const mobileFinalScale = Math.max(0.50, Math.min(0.68, fitByHeight, fitByWidth));
+      const mobileIntroScale = Math.max(0.88, Math.min(1.0, mobileFinalScale * 1.48));
+      const mobileIntroY = Math.min(128, Math.max(72, window.innerHeight * 0.14));
 
       const applyFinalMobileState = () => {
-        gsap.set(stage, { top: '4rem', bottom: '45%' });
-        gsap.set(wrapper, { x: 0, y: 0, scale: mobileFinalScale, rotationX: 0, rotationY: 0, rotationZ: 0, opacity: 1 });
+        gsap.set(stage, { overflow: 'hidden' });
+        gsap.set(wrapper, {
+          x: 0,
+          y: 0,
+          scale: mobileFinalScale,
+          rotationX: 0,
+          rotationY: 0,
+          rotationZ: 0,
+          opacity: 1,
+        });
         gsap.set(copy, { autoAlpha: 1, y: 0 });
         gsap.set(headlineChildren, { y: 0, opacity: 1 });
         gsap.set(subtextRef.current, { y: 0, opacity: 1 });
@@ -117,7 +122,15 @@ export const Hero = () => {
       }
 
       setIsInteractive(false);
-      gsap.set(wrapper, { scale: 0.92, rotationY: 6, rotationX: 4, y: 8, x: 0, opacity: 0 });
+      gsap.set(stage, { overflow: 'visible' });
+      gsap.set(wrapper, {
+        scale: Math.max(0.82, mobileIntroScale - 0.08),
+        rotationY: 6,
+        rotationX: 4,
+        y: mobileIntroY + 18,
+        x: 0,
+        opacity: 0,
+      });
       gsap.set(copy, { autoAlpha: 0, y: 18 });
       gsap.set(headlineChildren, { y: 0, opacity: 1 });
       gsap.set(subtextRef.current, { y: 0, opacity: 1 });
@@ -126,11 +139,26 @@ export const Hero = () => {
 
       const intro = gsap.timeline({ onComplete: () => setIsInteractive(true) });
       introTimelineRef.current = intro;
-      intro.to(wrapper, { scale: 1.02, rotationY: 2, rotationX: 2, y: 0, opacity: 1, duration: 1.2, ease: 'power3.out' }, 0);
+      intro.to(wrapper, {
+        scale: mobileIntroScale,
+        rotationY: 2,
+        rotationX: 2,
+        y: mobileIntroY,
+        opacity: 1,
+        duration: 1.2,
+        ease: 'power3.out',
+      }, 0);
       runDemoKeys(intro);
-      intro.to(stage, { top: '4rem', bottom: '45%', duration: 0.95, ease: 'power3.inOut' }, 3.72);
-      intro.to(wrapper, { scale: mobileFinalScale, rotationY: 0, rotationX: 0, y: 0, duration: 0.95, ease: 'power3.inOut' }, 3.72);
-      intro.to(copy, { autoAlpha: 1, y: 0, duration: 0.55, ease: 'power2.out' }, 4.02);
+      intro.to(wrapper, {
+        scale: mobileFinalScale,
+        rotationY: 0,
+        rotationX: 0,
+        y: 0,
+        duration: 0.95,
+        ease: 'power3.inOut',
+      }, 3.72);
+      intro.set(stage, { overflow: 'hidden' }, 4.0);
+      intro.to(copy, { autoAlpha: 1, y: 0, duration: 0.55, ease: 'power2.out' }, 4.04);
 
       finishIntroRef.current = () => {
         intro.kill();
@@ -256,7 +284,7 @@ export const Hero = () => {
         </div>
 
         <div className="max-w-7xl h-full md:h-auto w-full mx-auto relative md:grid md:grid-cols-1 lg:grid-cols-2 md:gap-4 lg:gap-16 md:items-center z-10">
-          <div className="absolute inset-x-0 bottom-0 h-[45%] bg-deep-ink md:relative md:h-auto md:min-h-[330px] lg:min-h-[560px] md:order-1 lg:pr-8 z-20">
+          <div className="absolute inset-x-0 bottom-0 h-[46%] md:relative md:h-auto md:min-h-[330px] lg:min-h-[560px] md:order-1 lg:pr-8 z-20">
             <div ref={heroCopyRef} className="absolute inset-0 flex flex-col justify-center md:justify-center gap-2.5 sm:gap-5 lg:gap-6">
               <div className="text-[9px] sm:text-xs font-mono tracking-widest text-acid-lime uppercase overflow-hidden">
                 <span ref={eyebrowRef} className="block">{t('hero.eyebrow')}</span>
@@ -298,7 +326,7 @@ export const Hero = () => {
             ))}
           </div>
 
-          <div ref={calcStageRef} className="absolute inset-0 overflow-hidden flex items-center justify-center pointer-events-none md:relative md:inset-auto md:overflow-visible md:h-auto md:order-2 lg:justify-end perspective-1000 md:px-2 lg:pl-4 lg:pr-8 z-10">
+          <div ref={calcStageRef} className="absolute inset-x-0 top-16 bottom-[46%] overflow-visible flex items-center justify-center pointer-events-none md:relative md:inset-auto md:overflow-visible md:h-auto md:order-2 lg:justify-end perspective-1000 md:px-2 lg:pl-4 lg:pr-8 z-10">
             <div ref={calcWrapperRef} className="pointer-events-auto w-full max-w-[300px] sm:max-w-[285px] lg:max-w-[320px] will-change-transform origin-center">
               <Calculator ref={calcRef} isInteractive={isInteractive} onInteract={takeControl} />
             </div>
