@@ -1,3 +1,20 @@
+export type AppLanguage = 'tr' | 'en';
+
+export const FINANCE_LOCALES = {
+  tr: {
+    symbol: '₺',
+    code: 'TRY',
+    locale: 'tr-TR',
+  },
+  en: {
+    symbol: '€',
+    code: 'EUR',
+    locale: 'en-IE',
+  },
+} as const;
+
+export const getFinanceLocale = (language: AppLanguage) => FINANCE_LOCALES[language];
+
 export const APP_CONFIG = {
   companyName: 'Sayısal',
   tagline: 'Muhasebe, Ama Biraz Daha Canlı.',
