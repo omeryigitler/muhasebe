@@ -35,8 +35,17 @@ export const Process = () => {
       text: t('process.s3.d'),
       color: 'bg-coral text-deep-ink',
       subtle: 'text-deep-ink/55 border-deep-ink/15 bg-deep-ink/[0.045]',
+      icon: '→',
+      label: language === 'tr' ? 'Plan' : 'Plan',
+    },
+    {
+      id: '04',
+      title: t('process.s4.t'),
+      text: t('process.s4.d'),
+      color: 'bg-[#FF90E8] text-deep-ink',
+      subtle: 'text-deep-ink/55 border-deep-ink/15 bg-deep-ink/[0.045]',
       icon: '=',
-      label: language === 'tr' ? 'Düzen' : 'Order',
+      label: language === 'tr' ? 'Yönetim' : 'Manage',
     },
   ];
 
@@ -65,7 +74,7 @@ export const Process = () => {
     <section ref={container} className="relative bg-warm-paper text-deep-ink py-24 md:py-32 px-4 md:px-8 overflow-clip">
       <div className="max-w-6xl mx-auto mb-16 md:mb-24">
         <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-deep-ink/40 mb-6">
-          {language === 'tr' ? 'Üç adım. Gereksiz sürtünme yok.' : 'Three steps. No unnecessary friction.'}
+          {language === 'tr' ? 'Dört adım. Gereksiz sürtünme yok.' : 'Four steps. No unnecessary friction.'}
         </p>
         <h2 className="max-w-5xl text-5xl md:text-7xl lg:text-[5.8rem] font-display leading-[0.93] tracking-[-0.04em]">
           {t('process.title')}

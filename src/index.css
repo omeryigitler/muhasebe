@@ -8,7 +8,7 @@
   --color-coral: #FF6654;
   --color-vivid-purple: #9A6AFF;
 
-  --font-display: "Fredoka", sans-serif;
+  --font-display: "Fredoka", "Nunito", sans-serif;
   --font-body: "DM Sans", sans-serif;
   --font-mono: "IBM Plex Mono", monospace;
   --font-playful: "Bowlby One SC", sans-serif;
@@ -30,7 +30,17 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
-    font-weight: 650;
+    font-weight: 700;
+  }
+
+  html[lang="tr"] .font-display,
+  html[lang="tr"] h1,
+  html[lang="tr"] h2,
+  html[lang="tr"] h3,
+  html[lang="tr"] h4,
+  html[lang="tr"] h5,
+  html[lang="tr"] h6 {
+    font-language-override: "TRK";
   }
 
   :focus-visible {

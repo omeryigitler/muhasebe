@@ -47,8 +47,10 @@ const dictionaries: Record<Language, Dictionary> = {
     'process.s1.d': 'Durumunu anlat.',
     'process.s2.t': 'Belgeleri paylaş.',
     'process.s2.d': 'Biz her şeyi inceleyelim.',
-    'process.s3.t': 'Gerisini bize bırak.',
-    'process.s3.d': 'Sistemini kuralım.',
+    'process.s3.t': 'Planı netleştirelim.',
+    'process.s3.d': 'İhtiyacı, sorumlulukları ve takvimi birlikte netleştirelim.',
+    'process.s4.t': 'Gerisini bize bırak.',
+    'process.s4.d': 'Sistemini kuralım ve akışı yönetelim.',
     'stats.clients': 'Müşteri',
     'stats.returns': 'Beyanname',
     'stats.years': 'Yıl',
@@ -78,9 +80,7 @@ const dictionaries: Record<Language, Dictionary> = {
     'faq.q3': 'Ön muhasebe programı kullanmalı mıyım?',
     'faq.a3': 'İşletmenizin hacmine göre değişir. Faturalarınızı düzenli takip etmek için web tabanlı basit bir yazılım kullanmanızı önerir ve entegrasyonu sağlarız.',
     'faq.q4': 'Mali müşavirlik ücretlerine neler dahildir?',
-    'faq.a4': 'Aylık defter tutma, beyanname hazırlama, vergi danışmanlığı ve temel finansal raporlama hizmetleri aylık ücretimize dahildir.',
-    'faq.q5': 'Şirketim zarar ederse yine de vergi öder miyim?',
-    'faq.a5': 'Zarar durumunda Gelir veya Kurumlar Vergisi ödemezsiniz ancak KDV, Muhtasar ve Damga Vergisi gibi sabit ve işleme bağlı vergiler çıkabilir.'
+    'faq.a4': 'Aylık defter tutma, beyanname hazırlama, vergi danışmanlığı ve temel finansal raporlama hizmetleri aylık ücretimize dahildir.'
   },
   en: {
     'nav.services': 'Services',
@@ -122,8 +122,10 @@ const dictionaries: Record<Language, Dictionary> = {
     'process.s1.d': 'Tell us your situation.',
     'process.s2.t': 'Share documents.',
     'process.s2.d': 'We review everything.',
-    'process.s3.t': 'Leave the rest to us.',
-    'process.s3.d': 'We set up your system.',
+    'process.s3.t': 'Define the plan.',
+    'process.s3.d': 'We align the scope, responsibilities, and timeline.',
+    'process.s4.t': 'Leave the rest to us.',
+    'process.s4.d': 'We set up the system and manage the flow.',
     'stats.clients': 'Clients',
     'stats.returns': 'Returns Filed',
     'stats.years': 'Years',
@@ -153,9 +155,7 @@ const dictionaries: Record<Language, Dictionary> = {
     'faq.q3': 'Should I use cloud accounting software?',
     'faq.a3': 'It depends on your business volume. We highly recommend and can integrate simple web-based software to keep your invoices organized.',
     'faq.q4': 'What is included in the advisory fees?',
-    'faq.a4': 'Monthly bookkeeping, tax return preparation, tax advisory, and basic financial reporting are all included in our flat monthly fee.',
-    'faq.q5': 'Do I still pay taxes if my company makes a loss?',
-    'faq.a5': 'You will not pay Income or Corporate Tax on a loss, but operational taxes like VAT, Withholding, and Stamp Duty may still apply.'
+    'faq.a4': 'Monthly bookkeeping, tax return preparation, tax advisory, and basic financial reporting are all included in our flat monthly fee.'
   }
 };
 

@@ -100,10 +100,6 @@ export const FAQ = () => {
           q: 'Aylık hizmet kapsamına neler dahil?',
           a: 'Hizmet kapsamı işletmenin ihtiyaçlarına göre belirlenir. Defter ve kayıt süreci, beyannameler, bordro, raporlama veya danışmanlık gibi kalemler teklif aşamasında açıkça listelenir.',
         },
-        {
-          q: 'Zarar eden işletmede hiç vergi çıkmaz mı?',
-          a: 'Tek bir kâr/zarar rakamı tüm yükümlülükleri belirlemez. Vergi türü, işlem yapısı ve şirketin durumuna göre farklı yükümlülükler oluşabilir; değerlendirme güncel kayıtlar üzerinden yapılmalıdır.',
-        },
       ]
     : [
         {
@@ -122,10 +118,6 @@ export const FAQ = () => {
           q: 'What is included in the monthly service?',
           a: 'Scope is defined around the business. Bookkeeping, filings, payroll, reporting, and advisory items are listed explicitly in the proposal so there are no assumed inclusions.',
         },
-        {
-          q: 'Does a loss mean there are no tax obligations?',
-          a: 'A single profit or loss figure does not determine every obligation. Different taxes and filing duties may still apply depending on the business and its transactions, so the current records need to be reviewed.',
-        },
       ];
 
   const colorThemes: Theme[] = [
@@ -133,7 +125,6 @@ export const FAQ = () => {
     { bg: 'bg-acid-lime', text: 'text-deep-ink', numActive: 'text-deep-ink/60' },
     { bg: 'bg-coral', text: 'text-deep-ink', numActive: 'text-deep-ink/60' },
     { bg: 'bg-[#FF90E8]', text: 'text-deep-ink', numActive: 'text-deep-ink/60' },
-    { bg: 'bg-deep-ink', text: 'text-warm-paper', numActive: 'text-warm-paper/60' },
   ];
 
   return (
@@ -156,7 +147,7 @@ export const FAQ = () => {
               question={faq.q}
               answer={faq.a}
               isOpen={openIndex === index}
-              theme={colorThemes[index % colorThemes.length]}
+              theme={colorThemes[index]}
               onClick={() => setOpenIndex(openIndex === index ? null : index)}
             />
           ))}

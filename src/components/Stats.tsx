@@ -6,16 +6,16 @@ export const Stats = () => {
 
   const principles = language === 'tr'
     ? [
-        { symbol: '+', title: 'Netlik', description: 'Rakamları karar verebileceğiniz bir dile çevir.', layer: 'bg-acid-lime', hoverText: 'group-hover:text-deep-ink', hoverMuted: 'group-hover:text-deep-ink/60' },
-        { symbol: '−', title: 'Sürpriz', description: 'Son güne kalan belirsizliği süreçten çıkar.', layer: 'bg-coral', hoverText: 'group-hover:text-deep-ink', hoverMuted: 'group-hover:text-deep-ink/60' },
-        { symbol: '=', title: 'Düzen', description: 'Belgeleri, kayıtları ve raporları tek akışta tut.', layer: 'bg-electric-blue', hoverText: 'group-hover:text-white', hoverMuted: 'group-hover:text-white/65' },
-        { symbol: '→', title: 'Aksiyon', description: 'Raporu arşiv değil, bir sonraki karar için kullan.', layer: 'bg-vivid-purple', hoverText: 'group-hover:text-white', hoverMuted: 'group-hover:text-white/65' },
+        { symbol: '+', title: 'Netlik', description: 'Rakamları karar verebileceğiniz bir dile çevir.', layer: 'bg-electric-blue', hoverText: 'group-hover:text-white', hoverMuted: 'group-hover:text-white/65' },
+        { symbol: '−', title: 'Sürpriz', description: 'Son güne kalan belirsizliği süreçten çıkar.', layer: 'bg-acid-lime', hoverText: 'group-hover:text-deep-ink', hoverMuted: 'group-hover:text-deep-ink/60' },
+        { symbol: '=', title: 'Düzen', description: 'Belgeleri, kayıtları ve raporları tek akışta tut.', layer: 'bg-coral', hoverText: 'group-hover:text-deep-ink', hoverMuted: 'group-hover:text-deep-ink/60' },
+        { symbol: '→', title: 'Aksiyon', description: 'Raporu arşiv değil, bir sonraki karar için kullan.', layer: 'bg-[#FF90E8]', hoverText: 'group-hover:text-deep-ink', hoverMuted: 'group-hover:text-deep-ink/60' },
       ]
     : [
-        { symbol: '+', title: 'Clarity', description: 'Turn numbers into information you can make a decision with.', layer: 'bg-acid-lime', hoverText: 'group-hover:text-deep-ink', hoverMuted: 'group-hover:text-deep-ink/60' },
-        { symbol: '−', title: 'Surprises', description: 'Remove last-minute uncertainty from the process.', layer: 'bg-coral', hoverText: 'group-hover:text-deep-ink', hoverMuted: 'group-hover:text-deep-ink/60' },
-        { symbol: '=', title: 'Order', description: 'Keep documents, entries, and reporting in one clean flow.', layer: 'bg-electric-blue', hoverText: 'group-hover:text-white', hoverMuted: 'group-hover:text-white/65' },
-        { symbol: '→', title: 'Action', description: 'Use reporting for the next decision, not just the archive.', layer: 'bg-vivid-purple', hoverText: 'group-hover:text-white', hoverMuted: 'group-hover:text-white/65' },
+        { symbol: '+', title: 'Clarity', description: 'Turn numbers into information you can make a decision with.', layer: 'bg-electric-blue', hoverText: 'group-hover:text-white', hoverMuted: 'group-hover:text-white/65' },
+        { symbol: '−', title: 'Surprises', description: 'Remove last-minute uncertainty from the process.', layer: 'bg-acid-lime', hoverText: 'group-hover:text-deep-ink', hoverMuted: 'group-hover:text-deep-ink/60' },
+        { symbol: '=', title: 'Order', description: 'Keep documents, entries, and reporting in one clean flow.', layer: 'bg-coral', hoverText: 'group-hover:text-deep-ink', hoverMuted: 'group-hover:text-deep-ink/60' },
+        { symbol: '→', title: 'Action', description: 'Use reporting for the next decision, not just the archive.', layer: 'bg-[#FF90E8]', hoverText: 'group-hover:text-deep-ink', hoverMuted: 'group-hover:text-deep-ink/60' },
       ];
 
   return (
