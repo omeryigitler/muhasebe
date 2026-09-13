@@ -3,27 +3,39 @@ import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useLanguage } from '../context/LanguageContext';
+import { getFinanceLocale } from '../config';
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 export const ChaosToOrder = () => {
   const { t, language } = useLanguage();
   const container = useRef<HTMLElement>(null);
+  const finance = getFinanceLocale(language);
+
+  const formatCurrency = (value: number) => new Intl.NumberFormat(finance.locale, {
+    style: 'currency',
+    currency: finance.code,
+    currencyDisplay: 'narrowSymbol',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(value);
+
+  const formatSignedCurrency = (value: number) => `${value >= 0 ? '+' : '−'}${formatCurrency(Math.abs(value))}`;
 
   const rows = language === 'tr'
     ? [
-        ['FATURA 0294', 'SATIŞ', '+₺34.200'],
-        ['FİŞ 1182', 'GİDER', '−₺8.750'],
-        ['BANKA 08/12', 'TAHSİLAT', '+₺12.400'],
-        ['BORDRO 08', 'PERSONEL', '−₺19.680'],
-        ['KDV 08', 'VERGİ', '−₺3.420'],
+        ['FATURA 0294', 'SATIŞ', 34200],
+        ['FİŞ 1182', 'GİDER', -8750],
+        ['BANKA 08/12', 'TAHSİLAT', 12400],
+        ['BORDRO 08', 'PERSONEL', -19680],
+        ['KDV 08', 'VERGİ', -3420],
       ]
     : [
-        ['INVOICE 0294', 'SALES', '+₺34,200'],
-        ['RECEIPT 1182', 'EXPENSE', '−₺8,750'],
-        ['BANK 08/12', 'COLLECTION', '+₺12,400'],
-        ['PAYROLL 08', 'PEOPLE', '−₺19,680'],
-        ['VAT 08', 'TAX', '−₺3,420'],
+        ['INVOICE 0294', 'SALES', 34200],
+        ['RECEIPT 1182', 'EXPENSE', -8750],
+        ['BANK 08/12', 'COLLECTION', 12400],
+        ['PAYROLL 08', 'PEOPLE', -19680],
+        ['VAT 08', 'TAX', -3420],
       ];
 
   useGSAP(() => {
@@ -73,13 +85,13 @@ export const ChaosToOrder = () => {
     timeline.to(rules, { scaleX: 1, stagger: 0.05, duration: 0.45, ease: 'power2.out' }, 0.35);
     timeline.to('.ledger-header', { autoAlpha: 1, y: 0, duration: 0.35 }, 0.55);
     timeline.to('.ledger-total', { autoAlpha: 1, y: 0, duration: 0.45, ease: 'back.out(1.4)' }, 0.72);
-  }, { scope: container, dependencies: [language] });
+  }, { scope: container });
 
   return (
     <section ref={container} className="relative bg-deep-ink text-warm-paper py-36 px-4 md:px-8 overflow-hidden min-h-[110vh] flex items-center">
       <div className="absolute inset-0 pointer-events-none">
         <span className="absolute top-[12%] left-[7%] text-[8rem] font-display text-coral/10 rotate-12">%</span>
-        <span className="absolute bottom-[10%] right-[6%] text-[10rem] font-display text-electric-blue/10 -rotate-12">€</span>
+        <span className="absolute bottom-[10%] right-[6%] text-[10rem] font-display text-electric-blue/10 -rotate-12">{finance.symbol}</span>
       </div>
 
       <div className="max-w-6xl mx-auto w-full relative z-10">
@@ -109,7 +121,7 @@ export const ChaosToOrder = () => {
                 <div className="ledger-row grid grid-cols-[1.2fr_0.8fr_auto] gap-4 items-center py-5 md:py-6 font-mono will-change-transform">
                   <span className="text-sm md:text-base text-white/80">{row[0]}</span>
                   <span className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-white/35">{row[1]}</span>
-                  <span className={`text-right text-base md:text-lg ${row[2].startsWith('+') ? 'text-acid-lime' : 'text-coral'}`}>{row[2]}</span>
+                  <span className={`text-right text-base md:text-lg ${Number(row[2]) >= 0 ? 'text-acid-lime' : 'text-coral'}`}>{formatSignedCurrency(Number(row[2]))}</span>
                 </div>
               </div>
             ))}
@@ -119,7 +131,7 @@ export const ChaosToOrder = () => {
           <div className="ledger-total flex flex-col md:flex-row md:items-end justify-between gap-4 pt-7">
             <div>
               <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-white/30 mb-2">{language === 'tr' ? 'Net hareket' : 'Net movement'}</p>
-              <p className="font-display text-4xl md:text-6xl text-acid-lime">+₺14.750</p>
+              <p className="font-display text-4xl md:text-6xl text-acid-lime">{formatSignedCurrency(14750)}</p>
             </div>
             <p className="font-mono text-xs text-white/35 max-w-xs md:text-right">{language === 'tr' ? '5 belge → 5 sınıflandırılmış kayıt → 1 okunabilir sonuç' : '5 documents → 5 classified entries → 1 readable result'}</p>
           </div>

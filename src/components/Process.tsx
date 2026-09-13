@@ -68,7 +68,7 @@ export const Process = () => {
         },
       });
     });
-  }, { scope: container, dependencies: [language] });
+  }, { scope: container });
 
   return (
     <section ref={container} className="relative bg-warm-paper text-deep-ink py-24 md:py-32 px-4 md:px-8 overflow-clip">

@@ -5,11 +5,13 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Calculator, type CalculatorHandle } from './Calculator';
 import { useLanguage } from '../context/LanguageContext';
 import { Magnetic } from './Magnetic';
+import { getFinanceLocale } from '../config';
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 export const Hero = () => {
   const { t, language } = useLanguage();
+  const finance = getFinanceLocale(language);
   const container = useRef<HTMLElement>(null);
   const calcWrapperRef = useRef<HTMLDivElement>(null);
   const calcRef = useRef<CalculatorHandle>(null);
@@ -30,7 +32,7 @@ export const Hero = () => {
     steps: [
       { index: '01', kicker: 'Günlük akış', title: 'Muhasebe, evrak yığını değil sistemdir.', description: 'Fatura, fiş ve banka hareketleri tek bir düzenli akışta işlenir.', symbol: '+', accent: 'text-electric-blue' },
       { index: '02', kicker: 'Vergi kontrolü', title: 'KDV’yi son gün değil, her gün gör.', description: 'KDV ekle, KDV çıkar ve nakit etkisini rakamlar büyümeden takip et.', symbol: '%', accent: 'text-acid-lime' },
-      { index: '03', kicker: 'Bordro', title: 'Maaş günü sürprizsiz olsun.', description: 'Bordro, kesintiler ve ödeme toplamları net bir takvimle görünür kalır.', symbol: '€', accent: 'text-coral' },
+      { index: '03', kicker: 'Bordro', title: 'Maaş günü sürprizsiz olsun.', description: 'Bordro, kesintiler ve ödeme toplamları net bir takvimle görünür kalır.', symbol: finance.symbol, accent: 'text-coral' },
       { index: '04', kicker: 'Raporlama', title: 'Rakamlar sonunda bir karar söylesin.', description: 'Dönem sonunda yalnızca toplam değil, neyin neden değiştiğini gör.', symbol: '=', accent: 'text-vivid-purple' },
     ],
   } : {
@@ -41,7 +43,7 @@ export const Hero = () => {
     steps: [
       { index: '01', kicker: 'Daily flow', title: 'Bookkeeping should be a system, not a pile.', description: 'Invoices, receipts, and bank movements move through one clean accounting flow.', symbol: '+', accent: 'text-electric-blue' },
       { index: '02', kicker: 'Tax control', title: 'See VAT every day, not on the deadline.', description: 'Add VAT, extract VAT, and understand the cash impact before the numbers grow.', symbol: '%', accent: 'text-acid-lime' },
-      { index: '03', kicker: 'Payroll', title: 'Make payday predictable.', description: 'Payroll, deductions, and payment totals stay visible on one clear timeline.', symbol: '€', accent: 'text-coral' },
+      { index: '03', kicker: 'Payroll', title: 'Make payday predictable.', description: 'Payroll, deductions, and payment totals stay visible on one clear timeline.', symbol: finance.symbol, accent: 'text-coral' },
       { index: '04', kicker: 'Reporting', title: 'Make the numbers say what to do next.', description: 'At period end, see more than totals: understand what changed and why.', symbol: '=', accent: 'text-vivid-purple' },
     ],
   };
@@ -170,14 +172,14 @@ export const Hero = () => {
     return () => {
       finishIntroRef.current = () => undefined;
     };
-  }, { scope: container, dependencies: [language] });
+  }, { scope: container });
 
   return (
     <section id="top" ref={container} className="relative min-h-[420svh] lg:min-h-[520svh] motion-reduce:min-h-[100svh] bg-deep-ink text-warm-paper">
       <div className="sticky top-0 min-h-[100svh] h-[100svh] w-full overflow-hidden px-4 sm:px-6 md:px-12 pt-20 sm:pt-24 pb-3 sm:pb-8 flex items-center">
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute top-[16%] left-[8%] text-8xl lg:text-9xl font-mono text-acid-lime opacity-[0.06] rotate-12 blur-sm">%</div>
-          <div className="absolute bottom-[12%] right-[8%] text-8xl lg:text-9xl font-mono text-electric-blue opacity-[0.06] -rotate-12 blur-sm">€</div>
+          <div className="absolute bottom-[12%] right-[8%] text-8xl lg:text-9xl font-mono text-electric-blue opacity-[0.06] -rotate-12 blur-sm">{finance.symbol}</div>
           <div className="absolute left-1/2 top-0 h-full w-px bg-gradient-to-b from-transparent via-white/10 to-transparent hidden lg:block" />
         </div>
 

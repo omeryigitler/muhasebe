@@ -3,12 +3,14 @@ import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useLanguage } from '../context/LanguageContext';
+import { getFinanceLocale } from '../config';
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 export const Services = () => {
   const { t, language } = useLanguage();
   const container = useRef<HTMLElement>(null);
+  const finance = getFinanceLocale(language);
 
   const details = language === 'tr'
     ? [
@@ -37,7 +39,7 @@ export const Services = () => {
     'bg-[#00E5FF] text-deep-ink',
   ];
 
-  const symbols = ['+', '%', '€', '→', '=', '?'];
+  const symbols = ['+', '%', finance.symbol, '→', '=', '?'];
   const hoverText = ['group-hover:text-white', 'group-hover:text-deep-ink', 'group-hover:text-deep-ink', 'group-hover:text-white', 'group-hover:text-deep-ink', 'group-hover:text-deep-ink'];
 
   const services = Array.from({ length: 6 }, (_, index) => ({
@@ -67,7 +69,7 @@ export const Services = () => {
         },
       });
     });
-  }, { scope: container, dependencies: [language] });
+  }, { scope: container });
 
   return (
     <section id="services" ref={container} className="bg-warm-paper text-deep-ink py-28 px-4 md:px-8 overflow-hidden">
