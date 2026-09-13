@@ -21,7 +21,7 @@
   }
 
   html[lang="tr"] {
-    --font-display: "Lilita One", sans-serif;
+    --font-display: "DynaPuff", sans-serif;
   }
 
   html[lang="en"] {
@@ -41,15 +41,6 @@
     font-weight: 700;
   }
 
-  html[lang="tr"] h1,
-  html[lang="tr"] h2,
-  html[lang="tr"] h3,
-  html[lang="tr"] h4,
-  html[lang="tr"] h5,
-  html[lang="tr"] h6 {
-    font-weight: 400;
-  }
-
   :focus-visible {
     outline: 2px solid var(--color-acid-lime);
     outline-offset: 4px;
@@ -57,8 +48,8 @@
 }
 
 html[lang="tr"] .font-display {
-  font-family: "Lilita One", sans-serif;
-  font-weight: 400;
+  font-family: "DynaPuff", sans-serif;
+  font-weight: 700;
 }
 
 html[lang="en"] .font-display {
