@@ -1,11 +1,14 @@
-import React, { useState, useEffect, forwardRef, useImperativeHandle, useRef } from 'react';
+import React, { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
 import { cn } from '../utils/cn';
 import { APP_CONFIG, getFinanceLocale } from '../config';
 import { useLanguage } from '../context/LanguageContext';
 
+export type CalculatorDemoPreset = 'bookkeeping' | 'vat' | 'payroll' | 'reporting';
+
 export type CalculatorHandle = {
   simulatePress: (key: string) => void;
   setDisplay: (val: string) => void;
+  setDemo: (preset: CalculatorDemoPreset) => void;
 };
 
 interface CalculatorProps {
@@ -33,6 +36,8 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
     const [waitingForNewValue, setWaitingForNewValue] = useState(false);
     const [receipt, setReceipt] = useState<ReceiptEntry[]>([]);
     const [activeKey, setActiveKey] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
+    const [keyboardActive, setKeyboardActive] = useState(false);
 
     const receiptRef = useRef<HTMLDivElement>(null);
     const rootRef = useRef<HTMLDivElement>(null);
@@ -48,6 +53,15 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
       return Number.isFinite(parsed) ? parsed : 0;
     };
 
+    const resetCore = () => {
+      setDisplay('0');
+      setPreviousValue(null);
+      setOperator(null);
+      setWaitingForNewValue(false);
+      setReceipt([]);
+      setError(null);
+    };
+
     const addToReceipt = (kind: ReceiptEntryKind, amount: number, entryOperator?: string) => {
       setReceipt((prev) => [...prev, {
         id: Date.now() + Math.random(),
@@ -57,46 +71,118 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
       }]);
     };
 
-    const formatCurrency = (num: number) => {
-      return new Intl.NumberFormat(finance.locale, {
-        style: 'currency',
-        currency: finance.code,
-        currencyDisplay: 'narrowSymbol',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-      }).format(num);
+    const makeReceipt = (entries: Array<Omit<ReceiptEntry, 'id'>>) => {
+      const base = Date.now();
+      return entries.map((entry, index) => ({ ...entry, id: base + index }));
+    };
+
+    const formatCurrency = (num: number) => new Intl.NumberFormat(finance.locale, {
+      style: 'currency',
+      currency: finance.code,
+      currencyDisplay: 'narrowSymbol',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    }).format(num);
+
+    const formatLiveDisplay = (raw: string) => {
+      if (error) return error;
+
+      const negative = raw.startsWith('-');
+      const unsigned = negative ? raw.slice(1) : raw;
+      const hasDecimal = unsigned.includes('.');
+      const [integerPart = '0', fractionPart = ''] = unsigned.split('.');
+      const integerValue = Number(integerPart || '0');
+      const grouped = new Intl.NumberFormat(finance.locale, {
+        useGrouping: true,
+        maximumFractionDigits: 0,
+      }).format(Number.isFinite(integerValue) ? integerValue : 0);
+      const decimal = language === 'tr' ? ',' : '.';
+
+      return `${negative ? '-' : ''}${finance.symbol}${grouped}${hasDecimal ? `${decimal}${fractionPart}` : ''}`;
     };
 
     const getReceiptLabel = (entry: ReceiptEntry) => {
       switch (entry.kind) {
-        case 'entry':
-          return t('calc.entry');
-        case 'operation':
-          return entry.operator || '';
-        case 'total':
-          return t('calc.total');
-        case 'vat-add':
-          return `+ ${t('calc.vat')} ${APP_CONFIG.vatRate}%`;
-        case 'vat-remove':
-          return `− ${t('calc.vat')} ${APP_CONFIG.vatRate}%`;
-        default:
-          return '';
+        case 'entry': return t('calc.entry');
+        case 'operation': return entry.operator || '';
+        case 'total': return t('calc.total');
+        case 'vat-add': return `+ ${t('calc.vat')} ${APP_CONFIG.vatRate}%`;
+        case 'vat-remove': return `− ${t('calc.vat')} ${APP_CONFIG.vatRate}%`;
+        default: return '';
       }
     };
 
-    const calculate = (a: number, b: number, op: string) => {
+    const calculate = (a: number, b: number, op: string): number | null => {
       switch (op) {
         case '+': return a + b;
         case '-': return a - b;
         case '×': return a * b;
-        case '÷': return b === 0 ? 0 : a / b;
+        case '÷': return b === 0 ? null : a / b;
         default: return b;
       }
     };
 
+    const fail = () => {
+      setError(language === 'tr' ? 'HATA' : 'ERROR');
+      setPreviousValue(null);
+      setOperator(null);
+      setWaitingForNewValue(true);
+    };
+
+    const setDemo = (preset: CalculatorDemoPreset) => {
+      setError(null);
+      setPreviousValue(null);
+      setOperator(null);
+      setWaitingForNewValue(true);
+
+      if (preset === 'bookkeeping') {
+        setDisplay('5795');
+        setReceipt(makeReceipt([
+          { kind: 'entry', amount: 4820 },
+          { kind: 'operation', amount: 975, operator: '+' },
+          { kind: 'total', amount: 5795 },
+        ]));
+      } else if (preset === 'vat') {
+        setDisplay('6954');
+        setReceipt(makeReceipt([
+          { kind: 'entry', amount: 5795 },
+          { kind: 'vat-add', amount: 1159 },
+          { kind: 'total', amount: 6954 },
+        ]));
+      } else if (preset === 'payroll') {
+        setDisplay('42000');
+        setReceipt(makeReceipt([
+          { kind: 'entry', amount: 32500 },
+          { kind: 'operation', amount: 9500, operator: '+' },
+          { kind: 'total', amount: 42000 },
+        ]));
+      } else {
+        setDisplay('14750');
+        setReceipt(makeReceipt([
+          { kind: 'entry', amount: 34200 },
+          { kind: 'operation', amount: 19450, operator: '−' },
+          { kind: 'total', amount: 14750 },
+        ]));
+      }
+    };
+
     const handlePress = (key: string, source: 'user' | 'simulation' = 'user') => {
-      if (source === 'user') {
-        onInteract?.();
+      if (source === 'user') onInteract?.();
+
+      if (error) {
+        if (key === 'C') {
+          resetCore();
+          return;
+        }
+        if (/[0-9]/.test(key) || key === '.') {
+          setError(null);
+          setPreviousValue(null);
+          setOperator(null);
+          setWaitingForNewValue(false);
+          setReceipt([]);
+          setDisplay(key === '.' ? '0.' : key);
+        }
+        return;
       }
 
       if (/[0-9]/.test(key)) {
@@ -106,29 +192,41 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
         } else {
           setDisplay(display === '0' ? key : display + key);
         }
-      } else if (key === '.') {
+        return;
+      }
+
+      if (key === '.') {
         if (waitingForNewValue) {
           setDisplay('0.');
           setWaitingForNewValue(false);
         } else if (!display.includes('.')) {
           setDisplay(display + '.');
         }
-      } else if (key === 'C') {
-        setDisplay('0');
-        setPreviousValue(null);
-        setOperator(null);
-        setWaitingForNewValue(false);
-        setReceipt([]);
-      } else if (key === '⌫') {
+        return;
+      }
+
+      if (key === 'C') {
+        resetCore();
+        return;
+      }
+
+      if (key === '⌫') {
         if (waitingForNewValue) return;
         setDisplay(display.length > 1 ? display.slice(0, -1) : '0');
-      } else if (['+', '-', '×', '÷'].includes(key)) {
+        return;
+      }
+
+      if (['+', '-', '×', '÷'].includes(key)) {
         const currentNum = parseDisplay();
         if (previousValue === null) {
           setPreviousValue(currentNum);
           addToReceipt('entry', currentNum);
         } else if (operator && !waitingForNewValue) {
           const result = calculate(previousValue, currentNum, operator);
+          if (result === null) {
+            fail();
+            return;
+          }
           setDisplay(toDisplayValue(result));
           setPreviousValue(result);
           addToReceipt('operation', currentNum, operator);
@@ -136,10 +234,17 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
         }
         setOperator(key);
         setWaitingForNewValue(true);
-      } else if (key === '=') {
+        return;
+      }
+
+      if (key === '=') {
         const currentNum = parseDisplay();
         if (operator && previousValue !== null) {
           const result = calculate(previousValue, currentNum, operator);
+          if (result === null) {
+            fail();
+            return;
+          }
           setDisplay(toDisplayValue(result));
           addToReceipt('operation', currentNum, operator);
           addToReceipt('total', result);
@@ -147,25 +252,40 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
           setOperator(null);
           setWaitingForNewValue(true);
         }
-      } else if (key === 'VAT+') {
+        return;
+      }
+
+      if (key === '%') {
+        const currentNum = parseDisplay();
+        let percentageValue = currentNum / 100;
+        if (previousValue !== null && operator && ['+', '-'].includes(operator)) {
+          percentageValue = previousValue * (currentNum / 100);
+        }
+        setDisplay(toDisplayValue(percentageValue));
+        setWaitingForNewValue(false);
+        return;
+      }
+
+      if (key === 'VAT+') {
         const currentNum = parseDisplay();
         const vatAmount = currentNum * (APP_CONFIG.vatRate / 100);
         const total = currentNum + vatAmount;
         setDisplay(toDisplayValue(total));
+        addToReceipt('entry', currentNum);
         addToReceipt('vat-add', vatAmount);
         addToReceipt('total', total);
         setWaitingForNewValue(true);
-      } else if (key === 'VAT-') {
+        return;
+      }
+
+      if (key === 'VAT-') {
         const currentNum = parseDisplay();
         const net = currentNum / (1 + APP_CONFIG.vatRate / 100);
         const vatAmount = currentNum - net;
         setDisplay(toDisplayValue(net));
+        addToReceipt('entry', currentNum);
         addToReceipt('vat-remove', vatAmount);
         addToReceipt('total', net);
-        setWaitingForNewValue(true);
-      } else if (key === '%') {
-        const currentNum = parseDisplay();
-        setDisplay(toDisplayValue(currentNum / 100));
         setWaitingForNewValue(true);
       }
     };
@@ -177,28 +297,25 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
         window.setTimeout(() => setActiveKey(null), 150);
       },
       setDisplay: (val) => {
+        setError(null);
         setDisplay(val);
-      }
+      },
+      setDemo,
     }));
 
     useEffect(() => {
-      if (receiptRef.current) {
-        receiptRef.current.scrollTop = receiptRef.current.scrollHeight;
-      }
+      if (receiptRef.current) receiptRef.current.scrollTop = receiptRef.current.scrollHeight;
     }, [receipt]);
 
     useEffect(() => {
-      const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.metaKey || e.ctrlKey || e.altKey) return;
-
-        const target = e.target as HTMLElement | null;
-        if (target?.closest('input, textarea, select, [contenteditable="true"]')) return;
+      const handleKeyDown = (event: KeyboardEvent) => {
+        if (event.metaKey || event.ctrlKey || event.altKey) return;
 
         const root = rootRef.current;
-        if (!root) return;
-        const rect = root.getBoundingClientRect();
-        const isVisible = rect.bottom > 0 && rect.top < window.innerHeight && rect.right > 0 && rect.left < window.innerWidth;
-        if (!isVisible) return;
+        const activeElement = document.activeElement as HTMLElement | null;
+        if (!root || !activeElement || !root.contains(activeElement)) return;
+        if (activeElement.matches('input, textarea, select, [contenteditable="true"]')) return;
+        if (activeElement instanceof HTMLButtonElement && (event.key === 'Enter' || event.key === ' ')) return;
 
         const keyMap: Record<string, string> = {
           Enter: '=',
@@ -208,18 +325,20 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
           '/': '÷',
           ',': language === 'tr' ? '.' : ',',
         };
-        const mappedKey = keyMap[e.key] || e.key;
+        const mappedKey = keyMap[event.key] || event.key;
         const validKeys = ['0','1','2','3','4','5','6','7','8','9','.','+','-','×','÷','=','C','⌫','%'];
+
         if (validKeys.includes(mappedKey)) {
-          e.preventDefault();
+          event.preventDefault();
           setActiveKey(mappedKey);
           handlePress(mappedKey, 'user');
           window.setTimeout(() => setActiveKey(null), 150);
         }
       };
+
       window.addEventListener('keydown', handleKeyDown);
       return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [display, previousValue, operator, waitingForNewValue, isInteractive, language]);
+    }, [display, previousValue, operator, waitingForNewValue, error, language]);
 
     const renderKey = (
       label: string,
@@ -228,13 +347,11 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
       actionKey: string = label,
       ariaLabel?: string,
     ) => {
-      const baseClass = 'calc-btn relative flex items-center justify-center rounded-lg text-lg sm:text-xl font-mono select-none overflow-hidden active:translate-y-[2px]';
       const variants = {
-        default: 'bg-[#2A2B30] text-warm-paper hover:bg-[#32343A]',
-        operator: 'bg-electric-blue text-white hover:bg-opacity-90',
-        accent: 'bg-acid-lime text-deep-ink hover:bg-opacity-90',
+        default: 'bg-[#292B31] text-warm-paper hover:bg-[#33363D]',
+        operator: 'bg-electric-blue text-white hover:bg-[#6474FF]',
+        accent: 'bg-acid-lime text-deep-ink hover:bg-[#E1FF69]',
       };
-      const isSimActive = activeKey === actionKey;
 
       return (
         <button
@@ -242,121 +359,112 @@ export const Calculator = forwardRef<CalculatorHandle, CalculatorProps>(
           aria-label={ariaLabel || label}
           onClick={() => handlePress(actionKey, 'user')}
           className={cn(
-            baseClass,
+            'calc-btn min-h-[52px] sm:min-h-[58px] rounded-xl flex items-center justify-center font-mono text-lg sm:text-xl select-none',
             variants[variant],
-            isSimActive && 'sim-active',
-            colSpan === 2 && 'col-span-2',
-            isInteractive ? 'cursor-pointer' : 'cursor-default'
+            activeKey === actionKey && 'sim-active',
+            colSpan === 2 && 'col-span-2'
           )}
-          style={{ paddingBottom: '100%', height: 0 }}
         >
-          <span className="absolute inset-0 flex items-center justify-center">
-            {label}
-          </span>
+          {label}
         </button>
       );
     };
 
-    const renderVatKey = () => (
-      <div className="grid grid-rows-2 gap-1 rounded-lg overflow-hidden" style={{ aspectRatio: '1 / 1' }}>
-        {(['VAT+', 'VAT-'] as const).map((key) => (
-          <button
-            key={key}
-            type="button"
-            aria-label={key === 'VAT+'
-              ? (language === 'tr' ? `${t('calc.vat')} ekle` : `Add ${t('calc.vat')}`)
-              : (language === 'tr' ? `${t('calc.vat')} çıkar` : `Remove ${t('calc.vat')}`)}
-            onClick={() => handlePress(key, 'user')}
-            className={cn(
-              'calc-btn bg-acid-lime text-deep-ink font-mono text-[10px] sm:text-xs font-bold select-none',
-              activeKey === key && 'sim-active'
-            )}
-          >
-            {t('calc.vat')}{key.endsWith('+') ? '+' : '−'}
-          </button>
-        ))}
-      </div>
-    );
-
     return (
-      <div ref={rootRef} className={cn('relative w-full max-w-[280px] sm:max-w-[340px] perspective-1000 mx-auto', className)}>
-        <div
-          className="absolute left-1/2 -top-24 w-3/4 -translate-x-1/2 h-32 bg-[#F9F7F1] text-deep-ink font-mono text-xs p-4 rounded-t-sm shadow-md overflow-hidden flex flex-col justify-end uppercase"
-          style={{ transformOrigin: 'bottom center', zIndex: 0 }}
-        >
-          <div ref={receiptRef} className="overflow-y-auto no-scrollbar flex flex-col gap-1 w-full mask-image-bottom">
-            {receipt.map((entry) => (
-              <div key={entry.id} className={cn(
-                'flex justify-between w-full',
-                entry.kind === 'total' && 'border-t border-dashed border-deep-ink/30 pt-1 font-bold mt-1'
-              )}>
-                <span className="opacity-70">{getReceiptLabel(entry)}</span>
-                <span>{formatCurrency(entry.amount)}</span>
+      <div
+        ref={rootRef}
+        tabIndex={0}
+        aria-label={language === 'tr' ? 'Sayısal hesap makinesi. Klavye kullanmak için odaklayın.' : 'Sayısal calculator. Focus to use the keyboard.'}
+        onFocusCapture={() => setKeyboardActive(true)}
+        onBlurCapture={() => window.requestAnimationFrame(() => setKeyboardActive(Boolean(rootRef.current?.contains(document.activeElement))))}
+        onPointerDown={(event) => {
+          const target = event.target as HTMLElement;
+          if (!target.closest('button')) rootRef.current?.focus({ preventScroll: true });
+        }}
+        className={cn('native-cursor calculator-root relative w-full max-w-[300px] sm:max-w-[350px] perspective-1000 mx-auto outline-none', className)}
+      >
+        <div className="absolute left-1/2 -top-[102px] w-[84%] -translate-x-1/2 h-[122px] bg-[#F9F7F1] text-deep-ink font-mono text-[10px] sm:text-xs p-4 rounded-t-md shadow-md overflow-hidden flex flex-col uppercase" style={{ zIndex: 0 }}>
+          <div className="flex items-center justify-between pb-2 border-b border-deep-ink/12 text-[8px] sm:text-[9px] tracking-[0.18em] opacity-50">
+            <span>{language === 'tr' ? 'İşlem fişi' : 'Calculation tape'}</span>
+            <span>{finance.code}</span>
+          </div>
+          <div ref={receiptRef} className="mt-auto overflow-y-auto no-scrollbar flex flex-col gap-1 w-full mask-image-bottom">
+            {receipt.length === 0 ? (
+              <div className="flex justify-between opacity-30"><span>—</span><span>{formatCurrency(0)}</span></div>
+            ) : receipt.map((entry) => (
+              <div key={entry.id} className={cn('flex justify-between gap-3 w-full', entry.kind === 'total' && 'border-t border-dashed border-deep-ink/30 pt-1 font-bold mt-1')}>
+                <span className="opacity-70 truncate">{getReceiptLabel(entry)}</span>
+                <span className="tabular-nums shrink-0">{formatCurrency(entry.amount)}</span>
               </div>
             ))}
           </div>
-          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-b from-white/50 to-transparent" />
         </div>
 
-        <div className="calc-shadow relative z-10 bg-[#1A1C21] rounded-3xl p-4 sm:p-6 border border-white/5 flex flex-col gap-4 sm:gap-6 backdrop-blur-xl">
-          <div className="flex flex-col gap-2">
-            <div className="flex justify-between items-center px-1">
-              <span className="text-[10px] text-white/30 tracking-widest uppercase">Sayisal Pro</span>
-              <div className="flex gap-1">
-                <div className="w-2 h-2 rounded-full bg-coral/50" />
-                <div className="w-2 h-2 rounded-full bg-acid-lime/50" />
-              </div>
+        <div className="calc-shadow relative z-10 bg-[#1A1C21] rounded-[28px] p-4 sm:p-5 border border-white/8 flex flex-col gap-3.5 sm:gap-4">
+          <div className="flex items-center justify-between px-1">
+            <div>
+              <p className="font-mono text-[9px] text-white/28 tracking-[0.18em] uppercase">Sayısal / Calc</p>
+              <p className="font-mono text-[8px] text-white/18 tracking-[0.12em] uppercase mt-0.5">{finance.code} · {APP_CONFIG.vatRate}% {t('calc.vat')}</p>
             </div>
-
-            <div className="bg-[#101114] rounded-xl p-4 flex flex-col items-end shadow-inner border border-white/5 h-24 justify-end relative overflow-hidden">
-              <div className="absolute top-2 left-3 text-xs text-acid-lime/50 font-mono">
-                {operator || ''}
-              </div>
-              <div
-                className="text-3xl sm:text-4xl font-mono text-acid-lime tracking-tight tabular-nums truncate w-full text-right"
-                style={{ textShadow: '0 0 10px rgba(217,255,67,0.3)' }}
-              >
-                {language === 'tr' ? display.replace('.', ',') : display}
-              </div>
+            <div className="flex gap-1.5" aria-hidden="true">
+              <span className="w-2 h-2 rounded-full bg-coral/60" />
+              <span className="w-2 h-2 rounded-full bg-acid-lime/60" />
             </div>
           </div>
 
-          <div className="grid grid-cols-4 gap-2 sm:gap-3">
-            {renderKey('C', 1, 'accent')}
-            {renderKey('⌫')}
+          <div className={cn('bg-[#0E0F12] rounded-2xl px-4 py-3 min-h-[92px] flex flex-col items-end justify-end shadow-inner border transition-colors overflow-hidden', error ? 'border-coral/50' : 'border-white/5')}>
+            <div className="w-full flex items-center justify-between min-h-5 mb-1 font-mono text-[9px] uppercase tracking-[0.16em]">
+              <span className="text-white/20">{keyboardActive ? (language === 'tr' ? 'Klavye aktif' : 'Keyboard active') : ''}</span>
+              <span className="text-acid-lime/55">{operator || ''}</span>
+            </div>
+            <div
+              aria-live="polite"
+              aria-atomic="true"
+              className={cn('w-full text-right font-mono tracking-tight tabular-nums truncate', error ? 'text-2xl text-coral' : 'text-3xl sm:text-[2.15rem] text-acid-lime')}
+              style={!error ? { textShadow: '0 0 12px rgba(217,255,67,0.24)' } : undefined}
+            >
+              {formatLiveDisplay(display)}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => handlePress('VAT+', 'user')}
+              className={cn('calc-btn min-h-11 rounded-xl bg-acid-lime text-deep-ink font-mono text-[10px] sm:text-xs font-bold flex items-center justify-center gap-1.5', activeKey === 'VAT+' && 'sim-active')}
+            >
+              <span>+</span><span>{t('calc.vat')}</span><span>{APP_CONFIG.vatRate}%</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handlePress('VAT-', 'user')}
+              className={cn('calc-btn min-h-11 rounded-xl bg-[#F5F1E8] text-deep-ink font-mono text-[10px] sm:text-xs font-bold flex items-center justify-center gap-1.5', activeKey === 'VAT-' && 'sim-active')}
+            >
+              <span>−</span><span>{t('calc.vat')}</span><span>{APP_CONFIG.vatRate}%</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-4 gap-2 sm:gap-2.5">
+            {renderKey('C', 1, 'accent', 'C', language === 'tr' ? 'Temizle' : 'Clear')}
+            {renderKey('⌫', 1, 'default', '⌫', language === 'tr' ? 'Geri sil' : 'Backspace')}
             {renderKey('%', 1, 'operator')}
             {renderKey('÷', 1, 'operator')}
 
-            {renderKey('7')}
-            {renderKey('8')}
-            {renderKey('9')}
-            {renderKey('×', 1, 'operator')}
-
-            {renderKey('4')}
-            {renderKey('5')}
-            {renderKey('6')}
-            {renderKey('-', 1, 'operator')}
-
-            {renderKey('1')}
-            {renderKey('2')}
-            {renderKey('3')}
-            {renderKey('+', 1, 'operator')}
-
-            {renderVatKey()}
-            {renderKey('0')}
-            {renderKey(
-              language === 'tr' ? ',' : '.',
-              1,
-              'default',
-              '.',
-              language === 'tr' ? 'Ondalık ayırıcı' : 'Decimal point'
-            )}
+            {renderKey('7')}{renderKey('8')}{renderKey('9')}{renderKey('×', 1, 'operator')}
+            {renderKey('4')}{renderKey('5')}{renderKey('6')}{renderKey('−', 1, 'operator', '-')}
+            {renderKey('1')}{renderKey('2')}{renderKey('3')}{renderKey('+', 1, 'operator')}
+            {renderKey('0', 2)}
+            {renderKey(language === 'tr' ? ',' : '.', 1, 'default', '.', language === 'tr' ? 'Ondalık ayırıcı' : 'Decimal point')}
             {renderKey('=', 1, 'operator')}
           </div>
         </div>
+
+        <p className="mt-3 text-center font-mono text-[8px] sm:text-[9px] uppercase tracking-[0.16em] text-white/24">
+          {isInteractive
+            ? (language === 'tr' ? 'Tıkla veya odakla · Klavye destekli' : 'Click or focus · Keyboard enabled')
+            : (language === 'tr' ? 'Canlı demo çalışıyor' : 'Live demo running')}
+        </p>
       </div>
     );
   }
 );
-
-Calculator.displayName = 'Calculator';
