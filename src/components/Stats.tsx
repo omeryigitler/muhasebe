@@ -28,10 +28,10 @@ export const Stats = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-t border-l border-white/10">
           {principles.map((item, index) => (
             <article key={item.title} className="group relative min-h-[270px] p-7 md:p-8 border-r border-b border-white/10 flex flex-col justify-between overflow-hidden isolate">
-              <div className={`absolute inset-0 z-0 ${item.layer} translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(.2,.8,.2,1)]`} />
+              <div className={`absolute inset-0 z-0 ${item.layer} translate-y-[calc(100%_-_6px)] lg:translate-y-full lg:group-hover:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(.2,.8,.2,1)]`} />
 
               <div className="relative z-10 flex items-start justify-between gap-4">
-                <span className={`font-display font-bold text-7xl md:text-8xl leading-none text-acid-lime transition-[transform,color] duration-500 group-hover:scale-110 group-hover:rotate-[4deg] origin-left ${item.hoverText}`}>
+                <span className={`font-display font-bold text-7xl md:text-8xl leading-none text-acid-lime transition-[transform,color] duration-500 lg:group-hover:scale-110 lg:group-hover:rotate-[4deg] origin-left ${item.hoverText}`}>
                   {item.symbol}
                 </span>
                 <span className={`font-mono text-[9px] tracking-[0.24em] text-white/25 transition-colors duration-300 ${item.hoverMuted}`}>
