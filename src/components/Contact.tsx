@@ -30,7 +30,10 @@ export const Contact = () => {
     window.location.href = `mailto:${APP_CONFIG.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
-  const inputClass = 'w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 outline-none focus-visible:border-acid-lime focus-visible:ring-2 focus-visible:ring-acid-lime/30 focus:bg-white/10 transition-all duration-300 font-mono text-white placeholder-white/30';
+  const inputBase = 'w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 outline-none transition-[transform,box-shadow,border-color,background-color] duration-300 ease-out font-mono text-white placeholder-white/30 hover:-translate-x-1 focus-visible:-translate-x-1 focus:bg-white/10';
+  const nameInput = `${inputBase} hover:border-electric-blue focus-visible:border-electric-blue hover:shadow-[7px_7px_0_#5265FF] focus-visible:shadow-[7px_7px_0_#5265FF]`;
+  const emailInput = `${inputBase} hover:border-acid-lime focus-visible:border-acid-lime hover:shadow-[7px_7px_0_#D9FF43] focus-visible:shadow-[7px_7px_0_#D9FF43]`;
+  const messageInput = `${inputBase} hover:border-coral focus-visible:border-coral hover:shadow-[7px_7px_0_#FF6654] focus-visible:shadow-[7px_7px_0_#FF6654] resize-none`;
 
   return (
     <section id="contact" className="bg-deep-ink text-warm-paper py-32 px-4 relative overflow-hidden">
@@ -61,20 +64,20 @@ export const Contact = () => {
         <form onSubmit={handleSubmit} className="space-y-6" aria-describedby="contact-form-note">
           <div>
             <label htmlFor="contact-name" className="block font-mono text-xs opacity-60 mb-2 uppercase">{t('contact.form.name')}</label>
-            <input id="contact-name" required type="text" value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" className={inputClass} />
+            <input id="contact-name" required type="text" value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" className={nameInput} />
           </div>
           <div>
             <label htmlFor="contact-email" className="block font-mono text-xs opacity-60 mb-2 uppercase">{t('contact.form.email')}</label>
-            <input id="contact-email" required type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" className={inputClass} />
+            <input id="contact-email" required type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" className={emailInput} />
           </div>
           <div>
             <label htmlFor="contact-message" className="block font-mono text-xs opacity-60 mb-2 uppercase">{t('contact.form.help')}</label>
-            <textarea id="contact-message" required rows={5} value={message} onChange={(event) => setMessage(event.target.value)} className={`${inputClass} resize-none`} />
+            <textarea id="contact-message" required rows={5} value={message} onChange={(event) => setMessage(event.target.value)} className={messageInput} />
           </div>
 
           <button
             type="submit"
-            className="w-full bg-electric-blue text-white py-4 rounded-xl font-bold border-2 border-acid-lime/70 shadow-[0_6px_0_#D9FF43] hover:-translate-y-1 hover:bg-[#6170ff] hover:border-coral hover:shadow-[0_8px_0_#FF6654] active:translate-y-[3px] active:shadow-[0_3px_0_#D9FF43] transition-all duration-300 uppercase tracking-widest mt-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-acid-lime focus-visible:ring-offset-4 focus-visible:ring-offset-deep-ink"
+            className="w-full bg-electric-blue text-white py-4 rounded-xl font-bold border-2 border-transparent transition-[transform,box-shadow,border-color,background-color] duration-300 ease-out uppercase tracking-widest mt-4 hover:-translate-x-1 hover:-translate-y-1 hover:border-[#FF90E8] hover:shadow-[7px_7px_0_#FF90E8] focus-visible:-translate-x-1 focus-visible:-translate-y-1 focus-visible:border-[#FF90E8] focus-visible:shadow-[7px_7px_0_#FF90E8] active:translate-x-0 active:translate-y-[2px] active:shadow-[3px_3px_0_#FF90E8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF90E8] focus-visible:ring-offset-4 focus-visible:ring-offset-deep-ink"
           >
             {copy.submit}
           </button>
