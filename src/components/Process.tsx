@@ -71,17 +71,17 @@ export const Process = () => {
   }, { scope: container });
 
   return (
-    <section id="process" ref={container} className="relative bg-warm-paper text-deep-ink py-24 md:py-32 px-4 md:px-8 overflow-clip">
-      <div className="max-w-6xl mx-auto mb-16 md:mb-24">
-        <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-deep-ink/40 mb-6">
+    <section id="process" ref={container} className="relative bg-warm-paper text-deep-ink py-16 md:py-32 px-4 md:px-8 overflow-clip">
+      <div className="max-w-6xl mx-auto mb-10 md:mb-24">
+        <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-deep-ink/40 mb-4 md:mb-6">
           {language === 'tr' ? 'Dört adım. Gereksiz sürtünme yok.' : 'Four steps. No unnecessary friction.'}
         </p>
-        <h2 className="max-w-5xl text-5xl md:text-7xl lg:text-[5.8rem] font-display leading-[0.93] tracking-[-0.04em]">
+        <h2 className="max-w-5xl text-[2.6rem] sm:text-5xl md:text-7xl lg:text-[5.8rem] font-display leading-[0.93] tracking-[-0.04em]">
           {t('process.title')}
         </h2>
       </div>
 
-      <div className="max-w-5xl mx-auto flex flex-col gap-6 md:gap-[29vh] motion-reduce:gap-8 pb-0 md:pb-[8vh] motion-reduce:pb-0">
+      <div className="max-w-5xl mx-auto flex flex-col gap-4 md:gap-[29vh] motion-reduce:gap-8 pb-0 md:pb-[8vh] motion-reduce:pb-0">
         {steps.map((step, index) => (
           <div
             key={step.id}
@@ -89,33 +89,33 @@ export const Process = () => {
             style={{ top: `calc(106px + ${index * 32}px)`, zIndex: index + 1 }}
           >
             <article
-              className={`process-card relative overflow-hidden w-full ${step.color} rounded-[30px] md:rounded-[44px] border border-deep-ink/10 p-7 md:p-10 lg:p-12 shadow-[0_24px_70px_rgba(16,17,20,0.18)] transition-[transform,box-shadow] duration-500 md:hover:-translate-y-1 md:hover:shadow-[0_30px_90px_rgba(16,17,20,0.22)]`}
+              className={`process-card relative overflow-hidden w-full ${step.color} rounded-[24px] md:rounded-[44px] border border-deep-ink/10 p-5 md:p-10 lg:p-12 shadow-[0_18px_48px_rgba(16,17,20,0.16)] md:shadow-[0_24px_70px_rgba(16,17,20,0.18)] transition-[transform,box-shadow] duration-500 md:hover:-translate-y-1 md:hover:shadow-[0_30px_90px_rgba(16,17,20,0.22)]`}
             >
-              <div className="absolute inset-x-8 top-0 h-px bg-white/30 mix-blend-overlay" />
+              <div className="absolute inset-x-6 md:inset-x-8 top-0 h-px bg-white/30 mix-blend-overlay" />
 
-              <div className="flex items-center justify-between gap-4 mb-10 md:mb-16">
+              <div className="flex items-center justify-between gap-4 mb-7 md:mb-16">
                 <div className="flex items-center gap-3">
-                  <span className="font-mono text-xs font-bold tracking-[0.2em]">{step.id}</span>
-                  <span className="w-8 h-px bg-current opacity-25" />
-                  <span className="font-mono text-[10px] uppercase tracking-[0.24em] opacity-55">{step.label}</span>
+                  <span className="font-mono text-[10px] md:text-xs font-bold tracking-[0.2em]">{step.id}</span>
+                  <span className="w-6 md:w-8 h-px bg-current opacity-25" />
+                  <span className="font-mono text-[9px] md:text-[10px] uppercase tracking-[0.22em] md:tracking-[0.24em] opacity-55">{step.label}</span>
                 </div>
                 <span className={`hidden sm:inline-flex items-center rounded-full border px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.2em] ${step.subtle}`}>
                   {language === 'tr' ? 'Süreç' : 'Process'}
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-8 md:gap-14 items-end">
-                <div className="max-w-2xl">
-                  <h3 className="font-display text-4xl sm:text-5xl md:text-6xl leading-[0.95] tracking-[-0.035em] mb-5">
+              <div className="grid grid-cols-[1fr_auto] gap-5 md:gap-14 items-end">
+                <div className="max-w-2xl min-w-0">
+                  <h3 className="font-display text-3xl sm:text-5xl md:text-6xl leading-[0.95] tracking-[-0.035em] mb-3 md:mb-5">
                     {step.title}
                   </h3>
-                  <p className="font-body text-lg md:text-xl leading-relaxed opacity-72 max-w-xl">
+                  <p className="font-body text-base md:text-xl leading-relaxed opacity-72 max-w-xl">
                     {step.text}
                   </p>
                 </div>
 
-                <div className={`w-20 h-20 md:w-28 md:h-28 rounded-full border flex items-center justify-center ${step.subtle}`}>
-                  <span className="font-display font-bold text-4xl md:text-6xl leading-none" aria-hidden="true">{step.icon}</span>
+                <div className={`w-14 h-14 md:w-28 md:h-28 rounded-full border flex-shrink-0 flex items-center justify-center ${step.subtle}`}>
+                  <span className="font-display font-bold text-3xl md:text-6xl leading-none" aria-hidden="true">{step.icon}</span>
                 </div>
               </div>
             </article>
