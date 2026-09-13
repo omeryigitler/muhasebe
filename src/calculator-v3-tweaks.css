@@ -200,6 +200,13 @@
   display: none !important;
 }
 
+/* Remove redundant labels below the calculator. */
+#top .pc3-caption,
+#top .pc3-scene + div,
+#top > .sticky > :last-child {
+  display: none !important;
+}
+
 @media (max-width: 639px) {
   .pc3-scene {
     padding-top: 68px;
