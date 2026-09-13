@@ -3,116 +3,113 @@
 /*
  * Printer geometry
  * ----------------
- * Keep the paper locked to the slot, but expose much less paper so it reads
- * as a real printer feed rather than a floating card behind the calculator.
+ * The previous printer bezel pushed the paper visually behind the calculator.
+ * Keep the deck behind the paper, keep only the thin slot lip above it, and
+ * bring the thermal paper toward the viewer in the same 3D context.
  */
 .pc3-scene {
-  padding-top: 78px;
+  padding-top: 88px;
 }
 
 .pc3-device {
   z-index: 2;
+  transform-style: preserve-3d;
 }
 
+/* The calculator's top surface stays BEHIND the paper. */
 .pc3-topdeck {
-  z-index: 6;
+  z-index: 4;
   overflow: visible;
+  transform-style: preserve-3d;
 }
 
-/* Raised printer bezel around the slot. */
+/* Remove the raised housing that made the receipt look recessed/backward. */
 .pc3-topdeck::after {
-  content: "";
-  position: absolute;
-  left: 17%;
-  right: 17%;
-  top: 3px;
-  height: 24px;
-  pointer-events: none;
-  border-radius: 12px 12px 9px 9px;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.055), transparent 42%),
-    linear-gradient(155deg, #202329 0%, #111318 72%, #090a0d 100%);
-  border: 1px solid rgba(255,255,255,.035);
-  box-shadow:
-    0 5px 12px rgba(0,0,0,.28),
-    inset 0 1px rgba(255,255,255,.055),
-    inset 0 -5px 8px rgba(0,0,0,.34);
+  content: none !important;
+  display: none !important;
 }
 
+/*
+ * Paper sits in front of the top deck, but behind the narrow black slot lip.
+ * Its bottom edge is locked to the slot and the sheet leans slightly toward
+ * the viewer so it reads as paper being fed OUT of the machine.
+ */
 .pc3-receipt {
   top: auto;
-  bottom: calc(100% - 18px);
+  bottom: calc(100% - 20px);
   left: 50%;
   width: 55%;
-  height: 82px;
-  z-index: 5;
-  padding: 10px 13px 12px;
+  height: 88px;
+  z-index: 6;
+  padding: 11px 14px 13px;
   overflow: hidden;
   border: 0;
-  border-radius: 3px 3px 0 0;
-  transform: translateX(-50%) perspective(520px) rotateX(-2.2deg) rotateZ(-0.14deg);
+  border-radius: 4px 4px 1px 1px;
+  transform: translateX(-50%) translateZ(18px) rotateX(-7deg) rotateZ(-0.18deg);
   transform-origin: 50% 100%;
   backface-visibility: hidden;
   background:
-    linear-gradient(180deg, rgba(255,255,255,.58), transparent 16%),
-    repeating-linear-gradient(0deg, transparent 0 16px, rgba(16,17,20,.016) 17px),
-    linear-gradient(90deg, rgba(0,0,0,.022), transparent 8%, transparent 92%, rgba(0,0,0,.018)),
+    linear-gradient(180deg, rgba(255,255,255,.65), transparent 18%),
+    repeating-linear-gradient(0deg, transparent 0 17px, rgba(16,17,20,.016) 18px),
+    linear-gradient(90deg, rgba(0,0,0,.025), transparent 8%, transparent 92%, rgba(0,0,0,.018)),
     #f7f2e8;
   box-shadow:
-    0 8px 16px -12px rgba(0,0,0,.66),
-    0 2px 3px rgba(0,0,0,.06),
-    inset 0 1px rgba(255,255,255,.96),
-    inset 0 -7px 12px -14px rgba(16,17,20,.28);
+    0 18px 28px -18px rgba(0,0,0,.72),
+    0 5px 8px -6px rgba(0,0,0,.30),
+    inset 0 1px rgba(255,255,255,.97),
+    inset 0 -8px 13px -15px rgba(16,17,20,.30);
   transition:
     height 260ms cubic-bezier(.22,.78,.32,1),
     width 260ms cubic-bezier(.22,.78,.32,1),
     transform 260ms ease;
 }
 
-/* At rest only a small paper stub is visible. */
+/* At rest only a short paper stub is visible. */
 .pc3-receipt:has(.pc3-receipt-line.is-empty) {
-  height: 48px;
+  height: 52px;
   width: 52%;
 }
 
+/* Gentle paper crown/highlight, not a separate card edge. */
 .pc3-receipt::before {
   content: "";
   position: absolute;
   left: 7%;
   right: 7%;
   top: -5px;
-  height: 14px;
+  height: 16px;
   pointer-events: none;
   border-radius: 50%;
-  background: linear-gradient(180deg, rgba(255,255,255,.7), rgba(255,255,255,0));
-  opacity: .6;
+  background: linear-gradient(180deg, rgba(255,255,255,.76), rgba(255,255,255,0));
+  opacity: .62;
 }
 
+/* Contact shadow at the feed point. */
 .pc3-receipt::after {
   content: "";
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
-  height: 10px;
+  height: 12px;
   pointer-events: none;
-  background: linear-gradient(180deg, transparent, rgba(0,0,0,.045));
+  background: linear-gradient(180deg, transparent, rgba(0,0,0,.055));
 }
 
 .pc3-receipt-head {
   padding-bottom: 5px;
   border-bottom-color: rgba(16,17,20,.085);
-  font-size: 7.5px;
+  font-size: 7.7px;
 }
 
 .pc3-receipt-lines {
-  height: 39px;
+  height: 44px;
   gap: 2px;
-  font-size: 7.8px;
+  font-size: 8px;
 }
 
 .pc3-receipt:has(.pc3-receipt-line.is-empty) .pc3-receipt-lines {
-  height: 17px;
+  height: 19px;
 }
 
 .pc3-receipt-line {
@@ -137,44 +134,48 @@
   }
 }
 
-/* The dark feed slot is the foreground lip, above the paper and bezel. */
+/*
+ * Only this thin lip sits in front of the paper. No bulky housing/bezel.
+ * This is what visually cuts the lower edge of the sheet into the machine.
+ */
 .pc3-slot {
   z-index: 8;
-  top: 8px;
-  width: 54%;
+  top: 9px;
+  width: 57%;
   height: 11px;
   overflow: visible;
   border-radius: 999px;
-  background: linear-gradient(180deg, #020203, #08090b 58%, #1b1e22 100%);
+  background: linear-gradient(180deg, #020203 0%, #08090b 58%, #1b1e22 100%);
   box-shadow:
-    inset 0 5px 8px rgba(0,0,0,.99),
-    0 1px rgba(255,255,255,.045),
-    0 -2px 6px rgba(0,0,0,.42);
+    inset 0 4px 7px rgba(0,0,0,.98),
+    0 1px rgba(255,255,255,.05),
+    0 -1px 4px rgba(0,0,0,.30);
 }
 
+/* Shadow is cast ONTO the paper directly above the feed opening. */
 .pc3-slot::before {
   content: "";
   position: absolute;
-  left: 3%;
-  right: 3%;
-  top: -6px;
-  height: 8px;
+  left: 4%;
+  right: 4%;
+  top: -8px;
+  height: 10px;
   pointer-events: none;
-  background: linear-gradient(180deg, transparent, rgba(0,0,0,.30));
+  background: linear-gradient(180deg, transparent, rgba(0,0,0,.24));
   filter: blur(2px);
-  opacity: .95;
+  opacity: .78;
 }
 
 .pc3-slot::after {
   content: "";
   position: absolute;
-  left: 8%;
-  right: 8%;
-  bottom: -2px;
-  height: 2px;
+  left: 9%;
+  right: 9%;
+  bottom: -1px;
+  height: 1px;
   border-radius: 999px;
   pointer-events: none;
-  background: rgba(255,255,255,.03);
+  background: rgba(255,255,255,.035);
 }
 
 /* Display: cleaner financial typography, less retro / neon. */
@@ -201,39 +202,33 @@
 
 @media (max-width: 639px) {
   .pc3-scene {
-    padding-top: 60px;
-  }
-
-  .pc3-topdeck::after {
-    left: 15%;
-    right: 15%;
-    height: 21px;
+    padding-top: 68px;
   }
 
   .pc3-receipt {
-    bottom: calc(100% - 17px);
+    bottom: calc(100% - 19px);
     width: 59%;
-    height: 70px;
-    padding: 8px 10px 10px;
-    transform: translateX(-50%) perspective(420px) rotateX(-1.7deg) rotateZ(-0.1deg);
+    height: 74px;
+    padding: 9px 11px 11px;
+    transform: translateX(-50%) translateZ(12px) rotateX(-5deg) rotateZ(-0.12deg);
   }
 
   .pc3-receipt:has(.pc3-receipt-line.is-empty) {
     width: 56%;
-    height: 42px;
+    height: 44px;
   }
 
   .pc3-receipt-lines {
-    height: 32px;
-    font-size: 7px;
+    height: 35px;
+    font-size: 7.1px;
   }
 
   .pc3-receipt:has(.pc3-receipt-line.is-empty) .pc3-receipt-lines {
-    height: 14px;
+    height: 15px;
   }
 
   .pc3-slot {
-    width: 58%;
+    width: 61%;
   }
 }
 
