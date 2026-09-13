@@ -8,74 +8,78 @@
   --color-coral: #FF6654;
   --color-vivid-purple: #9A6AFF;
 
-  --font-display: "Outfit", sans-serif;
-  --font-body: "Plus Jakarta Sans", sans-serif;
+  --font-display: "Bricolage Grotesque", sans-serif;
+  --font-body: "DM Sans", sans-serif;
   --font-mono: "IBM Plex Mono", monospace;
-  --font-playful: "Lilita One", system-ui;
+  --font-playful: "Bricolage Grotesque", sans-serif;
 }
 
 @layer base {
   html {
     scroll-behavior: smooth;
+    color-scheme: dark;
   }
-  
+
   body {
     background-color: var(--color-deep-ink);
     color: var(--color-warm-paper);
     font-family: var(--font-body);
     overflow-x: hidden;
+    text-rendering: optimizeLegibility;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
     font-weight: 800;
   }
+
+  :focus-visible {
+    outline: 2px solid var(--color-acid-lime);
+    outline-offset: 4px;
+  }
 }
 
-/* Fruitz Font Style Utilities */
 .text-fruitz-lime {
   color: var(--color-acid-lime);
-  text-shadow: 2px 3px 0px rgba(0,0,0,0.8), 4px 6px 0px rgba(217, 255, 67, 0.2);
+  text-shadow: 2px 3px 0 rgba(0,0,0,0.8), 4px 6px 0 rgba(217,255,67,0.18);
 }
 
 .text-fruitz-coral {
   color: var(--color-coral);
-  text-shadow: 2px 3px 0px rgba(0,0,0,0.8), 4px 6px 0px rgba(255, 102, 84, 0.2);
+  text-shadow: 2px 3px 0 rgba(0,0,0,0.8), 4px 6px 0 rgba(255,102,84,0.18);
 }
 
 .text-fruitz-purple {
   color: var(--color-vivid-purple);
-  text-shadow: 2px 3px 0px rgba(0,0,0,0.8), 4px 6px 0px rgba(154, 106, 255, 0.2);
+  text-shadow: 2px 3px 0 rgba(0,0,0,0.8), 4px 6px 0 rgba(154,106,255,0.18);
 }
 
-/* Calculator specific styles */
 .calc-shadow {
-  box-shadow: 
-    0 25px 50px -12px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+  box-shadow:
+    0 25px 50px -12px rgba(0,0,0,0.5),
+    0 0 0 1px rgba(255,255,255,0.1) inset,
     0 -10px 20px -5px rgba(0,0,0,0.8) inset;
 }
 
 .calc-btn {
-  box-shadow: 
-    0 4px 6px -1px rgba(0, 0, 0, 0.3),
-    0 2px 4px -1px rgba(0, 0, 0, 0.2),
+  box-shadow:
+    0 4px 6px -1px rgba(0,0,0,0.3),
+    0 2px 4px -1px rgba(0,0,0,0.2),
     0 -2px 5px rgba(0,0,0,0.2) inset,
     0 1px 1px rgba(255,255,255,0.1) inset;
-  transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.1s cubic-bezier(0.4,0,0.2,1), box-shadow 0.1s cubic-bezier(0.4,0,0.2,1), background-color 0.15s ease;
 }
 
-.calc-btn:active, .calc-btn.sim-active {
+.calc-btn:active,
+.calc-btn.sim-active {
   transform: translateY(2px);
-  box-shadow: 
-    0 1px 2px rgba(0, 0, 0, 0.3),
-    0 -1px 2px rgba(0,0,0,0.4) inset;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 -1px 2px rgba(0,0,0,0.4) inset;
 }
 
-/* Hide scrollbar for tape */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -90,5 +94,25 @@
   body.hide-cursor,
   body.hide-cursor * {
     cursor: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  body,
+  body * {
+    cursor: auto !important;
   }
 }

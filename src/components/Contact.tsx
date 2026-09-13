@@ -3,25 +3,40 @@ import { APP_CONFIG } from '../config';
 import { useLanguage } from '../context/LanguageContext';
 
 export const Contact = () => {
-  const { t } = useLanguage();
-  const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
+  const { t, language } = useLanguage();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setStatus('submitting');
-    // Simulate API call
-    setTimeout(() => {
-      setStatus('success');
-    }, 1500);
+  const copy = language === 'tr'
+    ? {
+        submit: 'E-posta Oluştur',
+        note: 'Bu demo form veri göndermiyor. Gönder butonu varsayılan e-posta uygulamanızı açar.',
+      }
+    : {
+        submit: 'Create Email',
+        note: 'This demo form does not submit data. The button opens your default email app.',
+      };
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const subject = language === 'tr'
+      ? `${APP_CONFIG.companyName} web sitesi iletişim talebi — ${name}`
+      : `${APP_CONFIG.companyName} website enquiry — ${name}`;
+    const body = language === 'tr'
+      ? `İsim: ${name}\nE-posta: ${email}\n\nMesaj:\n${message}`
+      : `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`;
+
+    window.location.href = `mailto:${APP_CONFIG.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
+
+  const inputClass = 'w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 outline-none focus-visible:border-acid-lime focus-visible:ring-2 focus-visible:ring-acid-lime/30 focus:bg-white/10 transition-all duration-300 font-mono text-white placeholder-white/30';
 
   return (
     <section id="contact" className="bg-deep-ink text-warm-paper py-32 px-4 relative overflow-hidden">
-      
-      {/* Final CTA Text */}
-      <div className="max-w-7xl mx-auto mb-32 text-center relative z-10">
-        <h2 className="text-6xl md:text-[8rem] leading-[0.9] font-display mb-8">
-          {t('contact.t1')}<br/>
+      <div className="max-w-7xl mx-auto mb-28 text-center relative z-10">
+        <h2 className="text-6xl md:text-[8rem] leading-[0.88] font-display mb-8 tracking-tight">
+          {t('contact.t1')}<br />
           <span className="text-acid-lime">{t('contact.t2')}</span>
         </h2>
         <p className="text-xl md:text-3xl opacity-80 font-mono">
@@ -29,48 +44,44 @@ export const Contact = () => {
         </p>
       </div>
 
-      <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 relative z-10">
-        
+      <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-[0.8fr_1.2fr] gap-12 md:gap-20 relative z-10">
         <div>
           <h3 className="text-3xl font-display mb-8">{t('contact.meet')}</h3>
-          <div className="space-y-6 font-mono text-lg opacity-80">
-            <p>Email: <br/><a href={`mailto:${APP_CONFIG.email}`} className="text-electric-blue hover:text-white transition-colors">{APP_CONFIG.email}</a></p>
-            <p>{t('contact.find')} <br/>İstanbul, TR</p>
+          <div className="space-y-6 font-mono text-base md:text-lg text-white/70">
+            <p>
+              Email:<br />
+              <a href={`mailto:${APP_CONFIG.email}`} className="text-electric-blue hover:text-white transition-colors underline underline-offset-4 decoration-white/20">
+                {APP_CONFIG.email}
+              </a>
+            </p>
+            <p>{t('contact.find')}<br />{APP_CONFIG.location}</p>
           </div>
         </div>
 
-        <div>
-          {status === 'success' ? (
-            <div className="bg-[#1A1C21] p-8 rounded-2xl border border-white/10 font-mono flex flex-col items-center justify-center h-full text-center space-y-4">
-              <div className="text-acid-lime text-4xl">✓</div>
-              <p className="text-xl uppercase tracking-widest">{t('contact.form.success')}</p>
-              <p className="opacity-50 text-sm">{t('contact.form.successDesc')}</p>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label className="block font-mono text-xs opacity-60 mb-2 uppercase">{t('contact.form.name')}</label>
-                <input required type="text" className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 outline-none focus:border-acid-lime focus:bg-white/10 transition-all duration-300 font-mono text-white placeholder-white/30" />
-              </div>
-              <div>
-                <label className="block font-mono text-xs opacity-60 mb-2 uppercase">{t('contact.form.email')}</label>
-                <input required type="email" className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 outline-none focus:border-acid-lime focus:bg-white/10 transition-all duration-300 font-mono text-white placeholder-white/30" />
-              </div>
-              <div>
-                <label className="block font-mono text-xs opacity-60 mb-2 uppercase">{t('contact.form.help')}</label>
-                <textarea required rows={4} className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 outline-none focus:border-acid-lime focus:bg-white/10 transition-all duration-300 font-mono resize-none text-white placeholder-white/30"></textarea>
-              </div>
-              
-              <button 
-                type="submit" 
-                disabled={status === 'submitting'}
-                className="w-full bg-electric-blue text-white py-4 rounded-xl font-bold hover:-translate-y-1 hover:shadow-[4px_4px_0px_#D9FF43] border-2 border-transparent hover:border-acid-lime transition-all duration-300 disabled:opacity-50 uppercase tracking-widest mt-4"
-              >
-                {status === 'submitting' ? t('contact.form.submitting') : t('contact.form.submit')}
-              </button>
-            </form>
-          )}
-        </div>
+        <form onSubmit={handleSubmit} className="space-y-6" aria-describedby="contact-form-note">
+          <div>
+            <label htmlFor="contact-name" className="block font-mono text-xs opacity-60 mb-2 uppercase">{t('contact.form.name')}</label>
+            <input id="contact-name" required type="text" value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" className={inputClass} />
+          </div>
+          <div>
+            <label htmlFor="contact-email" className="block font-mono text-xs opacity-60 mb-2 uppercase">{t('contact.form.email')}</label>
+            <input id="contact-email" required type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" className={inputClass} />
+          </div>
+          <div>
+            <label htmlFor="contact-message" className="block font-mono text-xs opacity-60 mb-2 uppercase">{t('contact.form.help')}</label>
+            <textarea id="contact-message" required rows={5} value={message} onChange={(event) => setMessage(event.target.value)} className={`${inputClass} resize-none`} />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-electric-blue text-white py-4 rounded-xl font-bold hover:-translate-y-1 hover:shadow-[4px_4px_0px_#D9FF43] border-2 border-transparent hover:border-acid-lime transition-all duration-300 uppercase tracking-widest mt-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-acid-lime focus-visible:ring-offset-4 focus-visible:ring-offset-deep-ink"
+          >
+            {copy.submit}
+          </button>
+          <p id="contact-form-note" className="font-mono text-[10px] leading-relaxed text-white/35">
+            {copy.note}
+          </p>
+        </form>
       </div>
     </section>
   );

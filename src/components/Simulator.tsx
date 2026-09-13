@@ -4,98 +4,145 @@ import { useLanguage } from '../context/LanguageContext';
 
 export const Simulator = () => {
   const { t, language } = useLanguage();
+  const { simulator } = APP_CONFIG;
   const [revenue, setRevenue] = useState(50000);
   const [expenseRatio, setExpenseRatio] = useState(30);
+  const [scenarioRate, setScenarioRate] = useState(APP_CONFIG.taxScenarioRate);
 
   const expenses = revenue * (expenseRatio / 100);
-  const taxable = revenue - expenses;
-  const estimatedTax = taxable * 0.20; // Simulated 20% tax on profit
+  const taxable = Math.max(0, revenue - expenses);
+  const estimatedTax = taxable * (scenarioRate / 100);
 
-  const formatCurrency = (val: number) => {
-    return new Intl.NumberFormat(language === 'tr' ? 'tr-TR' : 'en-US', { style: 'currency', currency: language === 'tr' ? 'TRY' : 'USD', maximumFractionDigits: 0 })
-      .format(val).replace('₺', APP_CONFIG.currency).replace('$', APP_CONFIG.currency);
+  const copy = language === 'tr'
+    ? {
+        rate: 'Senaryo Vergi Oranı',
+        note: 'Oran, mevzuat sonucu değil; senaryo girdisidir.',
+        kicker: 'Canlı senaryo',
+      }
+    : {
+        rate: 'Scenario Tax Rate',
+        note: 'The rate is a scenario input, not a statutory result.',
+        kicker: 'Live scenario',
+      };
+
+  const formatCurrency = (value: number) => {
+    const formatted = new Intl.NumberFormat(language === 'tr' ? 'tr-TR' : 'en-US', {
+      maximumFractionDigits: 0,
+    }).format(value);
+    return `${APP_CONFIG.currency}${formatted}`;
   };
 
+  const sliderClass = 'w-full appearance-none bg-white/20 h-2 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-acid-lime focus-visible:ring-offset-4 focus-visible:ring-offset-electric-blue [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:bg-acid-lime [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer';
+
   return (
-    <section id="tools" className="py-24 px-4 md:px-8 bg-electric-blue text-white overflow-hidden relative">
-      {/* Dynamic Background shapes based on values */}
-      <div 
-        className="absolute bottom-0 left-0 bg-acid-lime/20 transition-all duration-700 ease-out"
-        style={{ width: `${(revenue / 500000) * 100}%`, height: '50vh', borderTopRightRadius: '100px' }}
+    <section id="tools" className="py-28 px-4 md:px-8 bg-electric-blue text-white overflow-hidden relative">
+      <div
+        className="absolute bottom-0 left-0 bg-acid-lime/20 transition-all duration-700 ease-out pointer-events-none"
+        style={{ width: `${Math.min(100, (revenue / simulator.maxRevenue) * 100)}%`, height: '50vh', borderTopRightRadius: '100px' }}
       />
-      <div 
-        className="absolute top-0 right-0 bg-coral/20 transition-all duration-700 ease-out"
+      <div
+        className="absolute top-0 right-0 bg-coral/20 transition-all duration-700 ease-out pointer-events-none"
         style={{ width: `${expenseRatio}%`, height: '100%', borderBottomLeftRadius: '200px' }}
       />
 
-      <div className="max-w-7xl mx-auto relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-16">
+      <div className="max-w-7xl mx-auto relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
         <div>
-          <h2 className="text-4xl md:text-6xl font-display mb-6 leading-tight">
+          <p className="font-mono text-xs uppercase tracking-[0.3em] text-acid-lime mb-5">{copy.kicker}</p>
+          <h2 className="text-5xl md:text-7xl font-display mb-6 leading-[0.95] tracking-tight">
             {t('sim.title')}
           </h2>
-          <p className="text-lg opacity-80 mb-12 max-w-md">
+          <p className="text-lg opacity-80 mb-12 max-w-lg leading-relaxed">
             {t('sim.desc')}
           </p>
 
-          <div className="space-y-10">
+          <div className="space-y-9">
             <div>
-              <div className="flex justify-between mb-4">
-                <label className="font-mono text-sm uppercase tracking-wider opacity-80">{t('sim.revenue')}</label>
-                <span className="font-mono font-bold text-acid-lime">{formatCurrency(revenue)}</span>
+              <div className="flex justify-between gap-4 mb-4">
+                <label htmlFor="revenue-range" className="font-mono text-xs uppercase tracking-wider opacity-80">{t('sim.revenue')}</label>
+                <span className="font-mono font-bold text-acid-lime tabular-nums">{formatCurrency(revenue)}</span>
               </div>
-              <input 
-                type="range" 
-                min="10000" 
-                max="500000" 
-                step="5000"
-                value={revenue} 
-                onChange={(e) => setRevenue(Number(e.target.value))}
-                className="w-full appearance-none bg-white/20 h-2 rounded-full outline-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:bg-acid-lime [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer"
+              <input
+                id="revenue-range"
+                aria-label={t('sim.revenue')}
+                type="range"
+                min={simulator.minRevenue}
+                max={simulator.maxRevenue}
+                step={simulator.revenueStep}
+                value={revenue}
+                onChange={(event) => setRevenue(Number(event.target.value))}
+                className={sliderClass}
               />
             </div>
 
             <div>
-              <div className="flex justify-between mb-4">
-                <label className="font-mono text-sm uppercase tracking-wider opacity-80">{t('sim.expenseRatio')}</label>
-                <span className="font-mono font-bold text-coral">%{expenseRatio}</span>
+              <div className="flex justify-between gap-4 mb-4">
+                <label htmlFor="expense-range" className="font-mono text-xs uppercase tracking-wider opacity-80">{t('sim.expenseRatio')}</label>
+                <span className="font-mono font-bold text-coral tabular-nums">%{expenseRatio}</span>
               </div>
-              <input 
-                type="range" 
-                min="10" 
-                max="80" 
-                step="5"
-                value={expenseRatio} 
-                onChange={(e) => setExpenseRatio(Number(e.target.value))}
-                className="w-full appearance-none bg-white/20 h-2 rounded-full outline-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:bg-coral [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer"
+              <input
+                id="expense-range"
+                aria-label={t('sim.expenseRatio')}
+                type="range"
+                min={simulator.minExpenseRatio}
+                max={simulator.maxExpenseRatio}
+                step={simulator.expenseStep}
+                value={expenseRatio}
+                onChange={(event) => setExpenseRatio(Number(event.target.value))}
+                className={sliderClass}
+              />
+            </div>
+
+            <div>
+              <div className="flex justify-between gap-4 mb-4">
+                <div>
+                  <label htmlFor="tax-rate-range" className="font-mono text-xs uppercase tracking-wider opacity-80">{copy.rate}</label>
+                  <p className="font-mono text-[10px] text-white/45 mt-1">{copy.note}</p>
+                </div>
+                <span className="font-mono font-bold text-white tabular-nums">%{scenarioRate}</span>
+              </div>
+              <input
+                id="tax-rate-range"
+                aria-label={copy.rate}
+                type="range"
+                min={simulator.minScenarioRate}
+                max={simulator.maxScenarioRate}
+                step={simulator.scenarioRateStep}
+                value={scenarioRate}
+                onChange={(event) => setScenarioRate(Number(event.target.value))}
+                className={sliderClass}
               />
             </div>
           </div>
         </div>
 
         <div className="flex flex-col justify-center">
-          <div className="bg-deep-ink rounded-3xl p-8 md:p-12 shadow-2xl border border-white/10 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-acid-lime opacity-10 blur-3xl rounded-full"></div>
-            
-            <div className="space-y-8">
+          <div className="bg-deep-ink rounded-[30px] p-8 md:p-12 shadow-2xl border border-white/10 relative overflow-hidden">
+            <div className="absolute -top-16 -right-16 w-48 h-48 bg-acid-lime opacity-10 blur-3xl rounded-full pointer-events-none" />
+            <div className="absolute top-8 right-8 font-display text-[7rem] leading-none text-white/[0.035] pointer-events-none">%</div>
+
+            <div className="space-y-8 relative z-10">
               <div className="border-b border-white/10 pb-6">
-                <p className="font-mono text-xs text-white/50 mb-2">{t('sim.estExpenses')}</p>
-                <p className="text-3xl font-mono text-coral">{formatCurrency(expenses)}</p>
+                <p className="font-mono text-xs text-white/50 mb-2 uppercase tracking-wider">{t('sim.estExpenses')}</p>
+                <p className="text-3xl font-mono text-coral tabular-nums">{formatCurrency(expenses)}</p>
               </div>
-              
+
               <div className="border-b border-white/10 pb-6">
-                <p className="font-mono text-xs text-white/50 mb-2">{t('sim.taxable')}</p>
-                <p className="text-3xl font-mono text-white">{formatCurrency(taxable)}</p>
+                <p className="font-mono text-xs text-white/50 mb-2 uppercase tracking-wider">{t('sim.taxable')}</p>
+                <p className="text-3xl font-mono text-white tabular-nums">{formatCurrency(taxable)}</p>
               </div>
 
               <div>
-                <p className="font-mono text-xs text-white/50 mb-2">{t('sim.estTax')}</p>
-                <p className="text-5xl md:text-6xl font-mono font-bold text-acid-lime">
+                <div className="flex items-center justify-between gap-4 mb-3">
+                  <p className="font-mono text-xs text-white/50 uppercase tracking-wider">{t('sim.estTax')}</p>
+                  <span className="font-mono text-[10px] border border-white/15 rounded-full px-3 py-1 text-white/50">%{scenarioRate}</span>
+                </div>
+                <p className="text-5xl md:text-6xl font-mono font-bold text-acid-lime tabular-nums break-words">
                   {formatCurrency(estimatedTax)}
                 </p>
               </div>
             </div>
 
-            <p className="text-[10px] text-white/40 mt-8 font-mono max-w-sm">
+            <p className="text-[10px] text-white/40 mt-8 font-mono max-w-md leading-relaxed">
               {t('sim.disclaimer')}
             </p>
           </div>

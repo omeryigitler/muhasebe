@@ -2,11 +2,25 @@ export const APP_CONFIG = {
   companyName: 'Sayısal',
   tagline: 'Muhasebe, Ama Biraz Daha Canlı.',
   email: 'hello@sayisal.co',
-  currency: '₺', // Configurable currency
-  vatRate: 20, // 20% VAT
+  location: 'İstanbul, TR',
+  currency: '₺',
+  vatRate: 20,
+  taxScenarioRate: 20,
+  simulator: {
+    minRevenue: 10000,
+    maxRevenue: 500000,
+    revenueStep: 5000,
+    minExpenseRatio: 10,
+    maxExpenseRatio: 80,
+    expenseStep: 5,
+    minScenarioRate: 5,
+    maxScenarioRate: 40,
+    scenarioRateStep: 1,
+  },
   socialLinks: {
-    twitter: '#',
-    linkedin: '#',
-    instagram: '#'
-  }
+    whatsapp: '',
+    linkedin: '',
+    twitter: '',
+    instagram: '',
+  },
 };

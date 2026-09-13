@@ -1,60 +1,40 @@
-import React, { useRef } from 'react';
-import gsap from 'gsap';
-import { useGSAP } from '@gsap/react';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import React from 'react';
 import { useLanguage } from '../context/LanguageContext';
 
-gsap.registerPlugin(useGSAP, ScrollTrigger);
-
 export const Stats = () => {
-  const { t } = useLanguage();
-  const container = useRef<HTMLDivElement>(null);
+  const { language } = useLanguage();
 
-  const stats = [
-    { label: t('stats.clients'), value: 128, suffix: '+' },
-    { label: t('stats.returns'), value: 3.4, suffix: 'K' },
-    { label: t('stats.years'), value: 12, suffix: '' },
-    { label: t('stats.response'), value: 24, suffix: 'H', prefix: '< ' },
-  ];
-
-  useGSAP(() => {
-    const numbers = gsap.utils.toArray('.stat-num') as HTMLElement[];
-    
-    numbers.forEach((num) => {
-      const targetVal = parseFloat(num.getAttribute('data-value') || '0');
-      gsap.fromTo(num, 
-        { textContent: 0 },
-        {
-          textContent: targetVal,
-          duration: 2,
-          ease: 'power2.out',
-          snap: { textContent: targetVal % 1 === 0 ? 1 : 0.1 },
-          stagger: 1,
-          scrollTrigger: {
-            trigger: container.current,
-            start: 'top 80%',
-            once: true
-          }
-        }
-      );
-    });
-  }, { scope: container });
+  const principles = language === 'tr'
+    ? [
+        { symbol: '+', title: 'Netlik', description: 'Rakamları karar verebileceğiniz bir dile çevir.' },
+        { symbol: '−', title: 'Sürpriz', description: 'Son güne kalan belirsizliği süreçten çıkar.' },
+        { symbol: '=', title: 'Düzen', description: 'Belgeleri, kayıtları ve raporları tek akışta tut.' },
+        { symbol: '→', title: 'Aksiyon', description: 'Raporu arşiv değil, bir sonraki karar için kullan.' },
+      ]
+    : [
+        { symbol: '+', title: 'Clarity', description: 'Turn numbers into information you can make a decision with.' },
+        { symbol: '−', title: 'Surprises', description: 'Remove last-minute uncertainty from the process.' },
+        { symbol: '=', title: 'Order', description: 'Keep documents, entries, and reporting in one clean flow.' },
+        { symbol: '→', title: 'Action', description: 'Use reporting for the next decision, not just the archive.' },
+      ];
 
   return (
-    <section ref={container} className="py-24 px-4 bg-deep-ink border-t border-white/10">
-      <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4">
-        {stats.map((stat, i) => (
-          <div key={i} className="flex flex-col items-center justify-center text-center">
-            <div className="text-5xl md:text-7xl font-mono text-acid-lime mb-4 flex items-center font-bold">
-              {stat.prefix}
-              <span className="stat-num" data-value={stat.value}>0</span>
-              {stat.suffix}
-            </div>
-            <p className="font-mono text-sm tracking-widest text-warm-paper/60 uppercase">
-              {stat.label}
-            </p>
-          </div>
-        ))}
+    <section className="py-24 px-4 md:px-8 bg-deep-ink border-t border-white/10 text-warm-paper">
+      <div className="max-w-7xl mx-auto">
+        <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-white/30 mb-10">
+          {language === 'tr' ? 'Sahte istatistik yok. Çalışma prensibi var.' : 'No invented stats. Just working principles.'}
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-t border-l border-white/10">
+          {principles.map((item) => (
+            <article key={item.title} className="min-h-[260px] p-7 md:p-8 border-r border-b border-white/10 flex flex-col justify-between group hover:bg-white/[0.035] transition-colors">
+              <span className="font-display text-7xl md:text-8xl leading-none text-acid-lime group-hover:scale-110 origin-left transition-transform">{item.symbol}</span>
+              <div>
+                <h3 className="font-display text-3xl mb-3">{item.title}</h3>
+                <p className="text-sm md:text-base text-white/45 leading-relaxed">{item.description}</p>
+              </div>
+            </article>
+          ))}
+        </div>
       </div>
     </section>
   );
