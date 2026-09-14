@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Instagram, Linkedin, MessageCircle, Twitter } from 'lucide-react';
-import { useReducedMotion } from 'motion/react';
 import { APP_CONFIG } from '../config';
 import { useLanguage } from '../context/LanguageContext';
 import { cn } from '../utils/cn';
@@ -8,9 +7,8 @@ import { Magnetic } from './Magnetic';
 
 export const Footer = () => {
   const { t, language } = useLanguage();
-  const reduceMotion = useReducedMotion();
-  const footerRef = useRef<HTMLElement>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const footerRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const footer = footerRef.current;
@@ -20,26 +18,47 @@ export const Footer = () => {
       ([entry]) => {
         setIsVisible(entry.isIntersecting);
       },
-      {
-        threshold: 0.28,
-        rootMargin: '0px 0px -6% 0px',
-      }
+      { threshold: 0.1 }
     );
 
     observer.observe(footer);
     return () => observer.disconnect();
   }, []);
 
-  const socialCopy = language === 'tr' ? 'bağlantı eklenecek' : 'link to be added';
-
   const socials = [
-    { key: 'whatsapp', label: 'WhatsApp', href: APP_CONFIG.socialLinks.whatsapp, icon: MessageCircle, hover: 'hover:bg-acid-lime hover:text-deep-ink' },
-    { key: 'linkedin', label: 'LinkedIn', href: APP_CONFIG.socialLinks.linkedin, icon: Linkedin, hover: 'hover:bg-electric-blue hover:text-white' },
-    { key: 'twitter', label: 'X / Twitter', href: APP_CONFIG.socialLinks.twitter, icon: Twitter, hover: 'hover:bg-coral hover:text-deep-ink' },
-    { key: 'instagram', label: 'Instagram', href: APP_CONFIG.socialLinks.instagram, icon: Instagram, hover: 'hover:bg-[#FF90E8] hover:text-deep-ink' },
+    {
+      key: 'whatsapp',
+      label: 'WhatsApp',
+      href: APP_CONFIG.socialLinks.whatsapp || '#',
+      hasRealLink: Boolean(APP_CONFIG.socialLinks.whatsapp),
+      icon: MessageCircle,
+      hover: 'hover:bg-acid-lime hover:text-deep-ink',
+    },
+    {
+      key: 'linkedin',
+      label: 'LinkedIn',
+      href: APP_CONFIG.socialLinks.linkedin || '#',
+      hasRealLink: Boolean(APP_CONFIG.socialLinks.linkedin),
+      icon: Linkedin,
+      hover: 'hover:bg-electric-blue hover:text-white',
+    },
+    {
+      key: 'twitter',
+      label: 'X / Twitter',
+      href: APP_CONFIG.socialLinks.twitter || '#',
+      hasRealLink: Boolean(APP_CONFIG.socialLinks.twitter),
+      icon: Twitter,
+      hover: 'hover:bg-coral hover:text-deep-ink',
+    },
+    {
+      key: 'instagram',
+      label: 'Instagram',
+      href: APP_CONFIG.socialLinks.instagram || '#',
+      hasRealLink: Boolean(APP_CONFIG.socialLinks.instagram),
+      icon: Instagram,
+      hover: 'hover:bg-[#FF90E8] hover:text-deep-ink',
+    },
   ];
-
-  const revealed = reduceMotion || isVisible;
 
   return (
     <footer ref={footerRef} className="bg-deep-ink text-warm-paper px-4 md:px-8 border-t border-white/10 overflow-hidden">
@@ -52,47 +71,37 @@ export const Footer = () => {
 
         <div
           className={cn(
-            'justify-self-center flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.045] p-1.5 transition-[opacity,transform] duration-700 ease-[cubic-bezier(.2,.9,.25,1.15)]',
-            revealed ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-14 scale-95 pointer-events-none'
+            'justify-self-center flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.045] p-1.5 transition-all duration-700 ease-out origin-center',
+            isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-6 scale-95'
           )}
           aria-label={language === 'tr' ? 'Sosyal medya' : 'Social media'}
         >
           {socials.map((social, index) => {
             const Icon = social.icon;
-            const delay = reduceMotion ? 0 : 100 + index * 105;
-            const itemRevealClass = cn(
-              'transition-[opacity,transform] duration-700 ease-[cubic-bezier(.2,.9,.25,1.2)]',
-              revealed ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-10 scale-75'
-            );
-            const iconClass = cn(
-              'w-10 h-10 rounded-full flex items-center justify-center text-white/68 transition-[background-color,color,transform] duration-300',
-              social.href ? `${social.hover} hover:-translate-y-0.5 cursor-pointer` : 'opacity-65 cursor-default'
-            );
 
             return (
-              <div key={social.key} className={itemRevealClass} style={{ transitionDelay: `${delay}ms` }}>
-                {social.href ? (
-                  <Magnetic>
-                    <a
-                      href={social.href}
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label={social.label}
-                      className={iconClass}
-                    >
-                      <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
-                    </a>
-                  </Magnetic>
-                ) : (
-                  <span
-                    role="img"
-                    aria-label={`${social.label} — ${socialCopy}`}
-                    title={`${social.label} — ${socialCopy}`}
-                    className={iconClass}
+              <div
+                key={social.key}
+                className={cn(
+                  'transition-all duration-500',
+                  isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+                )}
+                style={{ transitionDelay: `${isVisible ? 200 + index * 100 : 0}ms` }}
+              >
+                <Magnetic>
+                  <a
+                    href={social.href}
+                    target={social.hasRealLink ? '_blank' : undefined}
+                    rel={social.hasRealLink ? 'noreferrer' : undefined}
+                    aria-label={social.label}
+                    className={cn(
+                      'w-10 h-10 rounded-full flex items-center justify-center text-white/68 transition-[background-color,color] duration-300 cursor-pointer',
+                      social.hover
+                    )}
                   >
                     <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
-                  </span>
-                )}
+                  </a>
+                </Magnetic>
               </div>
             );
           })}
