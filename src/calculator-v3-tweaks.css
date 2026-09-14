@@ -209,7 +209,8 @@
 
 @media (max-width: 639px) {
   .pc3-scene {
-    width: min(430px, 122%) !important;
+    width: min(430px, 134%) !important;
+    zoom: .91;
     padding-top: 68px;
   }
 
