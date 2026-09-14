@@ -207,37 +207,99 @@
   display: none !important;
 }
 
+/*
+ * Mobile uses the exact same physical calculator geometry as desktop and then
+ * scales the whole object uniformly to 42%. This keeps width and height in the
+ * same mathematical proportion instead of independently compressing the mobile
+ * internals. Desktop scene width is 320px × 134% = 428.8px.
+ */
 @media (max-width: 639px) {
   .pc3-scene {
-    width: min(430px, 105%) !important;
-    zoom: .62;
-    padding-top: 68px;
+    width: 428.8px !important;
+    max-width: 428.8px !important;
+    zoom: .42;
+    padding-top: 88px;
+  }
+
+  .pc3-device {
+    transform: rotateX(1.6deg) rotateY(-2.2deg);
+    padding: 42px 24px 27px;
+    border-radius: 34px 34px 40px 40px;
+  }
+
+  .pc3-console {
+    grid-template-columns: minmax(0, 1fr) 76px;
+    gap: 12px;
+  }
+
+  .pc3-display,
+  .pc3-knob-panel {
+    min-height: 102px;
+  }
+
+  .pc3-knob {
+    width: 50px;
+    height: 50px;
+  }
+
+  .pc3-keypad {
+    gap: 10px;
+  }
+
+  .pc3-vat-row {
+    gap: 11px;
+  }
+
+  .pc3-key {
+    min-height: 49px;
+    border-radius: 13px;
+    font-size: 16px;
+    box-shadow:
+      0 5px 0 #111318,
+      0 8px 11px rgba(0,0,0,.29),
+      inset 0 1px rgba(255,255,255,.09),
+      inset 0 -3px 5px rgba(0,0,0,.20);
+  }
+
+  .pc3-vat-plus,
+  .pc3-vat-minus {
+    min-height: 46px;
+    font-size: 10px;
   }
 
   .pc3-receipt {
-    bottom: calc(100% - 19px);
-    width: 59%;
-    height: 74px;
-    padding: 9px 11px 11px;
-    transform: translateX(-50%) translateZ(12px) rotateX(-5deg) rotateZ(-0.12deg);
+    bottom: calc(100% - 20px);
+    width: 55%;
+    height: 88px;
+    padding: 11px 14px 13px;
+    transform: translateX(-50%) translateZ(18px) rotateX(-7deg) rotateZ(-0.18deg);
   }
 
   .pc3-receipt:has(.pc3-receipt-line.is-empty) {
-    width: 56%;
-    height: 44px;
+    width: 52%;
+    height: 52px;
+  }
+
+  .pc3-receipt-head {
+    font-size: 7.7px;
   }
 
   .pc3-receipt-lines {
-    height: 35px;
-    font-size: 7.1px;
+    height: 44px;
+    gap: 2px;
+    font-size: 8px;
   }
 
   .pc3-receipt:has(.pc3-receipt-line.is-empty) .pc3-receipt-lines {
-    height: 15px;
+    height: 19px;
   }
 
   .pc3-slot {
-    width: 61%;
+    width: 57%;
+  }
+
+  .pc3-value {
+    font-size: 2.4rem;
   }
 }
 
