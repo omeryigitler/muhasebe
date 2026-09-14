@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { DesktopHero } from './DesktopHero';
 import { MobileHero } from './MobileHero';
 
-const MOBILE_QUERY = '(max-width: 767px)';
+const MOBILE_QUERY = '(max-width: 1023px)';
 
 export const Hero = () => {
   const [isMobile, setIsMobile] = useState(() =>
