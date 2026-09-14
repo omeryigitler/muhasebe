@@ -25,7 +25,7 @@
 
 /* Remove the raised housing that made the receipt look recessed/backward. */
 .pc3-topdeck::after {
-  content: none !important;
+  content: "";
   display: none !important;
 }
 
@@ -209,7 +209,7 @@
 
 @media (max-width: 639px) {
   .pc3-scene {
-    width: min(430px, 134%) !important;
+    width: min(430px, 124%) !important;
     zoom: .62;
     padding-top: 68px;
   }
