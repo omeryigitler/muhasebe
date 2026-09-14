@@ -14,9 +14,9 @@ type MagneticProps = {
 export const Magnetic = ({
   children,
   className,
-  strength = 0.52,
-  radius = 92,
-  maxOffset = 26,
+  strength = 0.48,
+  radius = 88,
+  maxOffset = 24,
 }: MagneticProps) => {
   const hitAreaRef = useRef<HTMLDivElement>(null);
   const moverRef = useRef<HTMLDivElement>(null);
@@ -31,26 +31,17 @@ export const Magnetic = ({
     if (coarsePointer || reduceMotion) return;
 
     const xTo = gsap.quickTo(mover, 'x', {
-      duration: 0.42,
-      ease: 'power3.out',
+      duration: 0.5,
+      ease: 'elastic.out(1, 0.45)',
     });
     const yTo = gsap.quickTo(mover, 'y', {
-      duration: 0.42,
-      ease: 'power3.out',
+      duration: 0.5,
+      ease: 'elastic.out(1, 0.45)',
     });
 
-    let active = false;
-
     const reset = () => {
-      if (!active) return;
-      active = false;
-      gsap.to(mover, {
-        x: 0,
-        y: 0,
-        duration: 0.85,
-        ease: 'elastic.out(1, 0.38)',
-        overwrite: true,
-      });
+      xTo(0);
+      yTo(0);
     };
 
     const handlePointerMove = (event: PointerEvent) => {
@@ -73,7 +64,6 @@ export const Magnetic = ({
         return;
       }
 
-      active = true;
       const proximity = 1 - Math.min(distanceOutside / radius, 1);
       const targetX = gsap.utils.clamp(-maxOffset, maxOffset, dx * strength * proximity);
       const targetY = gsap.utils.clamp(-maxOffset, maxOffset, dy * strength * proximity);
@@ -82,14 +72,12 @@ export const Magnetic = ({
       yTo(targetY);
     };
 
-    const handleWindowBlur = () => reset();
-
     window.addEventListener('pointermove', handlePointerMove, { passive: true });
-    window.addEventListener('blur', handleWindowBlur);
+    window.addEventListener('blur', reset);
 
     return () => {
       window.removeEventListener('pointermove', handlePointerMove);
-      window.removeEventListener('blur', handleWindowBlur);
+      window.removeEventListener('blur', reset);
     };
   }, { scope: hitAreaRef, dependencies: [strength, radius, maxOffset] });
 
