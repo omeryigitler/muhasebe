@@ -85,8 +85,8 @@ export const Process = () => {
         {steps.map((step, index) => (
           <div
             key={step.id}
-            className="relative md:sticky motion-reduce:static w-full"
-            style={{ top: `calc(106px + ${index * 32}px)`, zIndex: index + 1 }}
+            className="relative top-0 md:sticky md:top-[var(--process-top)] motion-reduce:static w-full"
+            style={{ '--process-top': `${106 + index * 32}px` } as React.CSSProperties}
           >
             <article
               className={`process-card relative overflow-hidden w-full ${step.color} rounded-[24px] md:rounded-[44px] border border-deep-ink/10 p-5 md:p-10 lg:p-12 shadow-[0_18px_48px_rgba(16,17,20,0.16)] md:shadow-[0_24px_70px_rgba(16,17,20,0.18)] transition-[transform,box-shadow] duration-500 md:hover:-translate-y-1 md:hover:shadow-[0_30px_90px_rgba(16,17,20,0.22)]`}
