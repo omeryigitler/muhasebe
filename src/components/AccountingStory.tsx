@@ -102,7 +102,7 @@ export const AccountingStory = () => {
           calcRef.current?.setDemo(DEMO_PRESETS[next]);
         }
       },
-      { rootMargin: '-30% 0px -42% 0px', threshold: [0.2, 0.4, 0.6] },
+      { rootMargin: '-24% 0px -48% 0px', threshold: [0.15, 0.35, 0.55] },
     );
 
     nodes.forEach((node) => observer.observe(node));
@@ -120,7 +120,7 @@ export const AccountingStory = () => {
                 stepRefs.current[index] = node;
               }}
               data-step={index}
-              className="relative min-h-[46svh] sm:min-h-[50svh] lg:min-h-[72vh] flex items-center border-b border-white/10 py-12 sm:py-16 lg:py-20 overflow-hidden"
+              className="relative min-h-[46svh] sm:min-h-[50svh] lg:min-h-[64vh] flex items-center lg:items-start border-b border-white/10 py-12 sm:py-16 lg:pt-14 lg:pb-14 overflow-hidden"
             >
               <div className="relative z-10 max-w-2xl pr-8 sm:pr-16">
                 <div className="mb-4 sm:mb-6 flex items-center gap-3 font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.26em] text-white/40">
@@ -139,7 +139,7 @@ export const AccountingStory = () => {
 
               <div
                 aria-hidden="true"
-                className={`absolute right-0 sm:right-4 top-1/2 -translate-y-1/2 font-display text-[8rem] sm:text-[11rem] lg:text-[14rem] font-black leading-none opacity-[0.09] ${step.accent}`}
+                className={`absolute right-0 sm:right-4 top-1/2 lg:top-[42%] -translate-y-1/2 font-display text-[8rem] sm:text-[11rem] lg:text-[14rem] font-black leading-none opacity-[0.09] ${step.accent}`}
               >
                 {step.symbol}
               </div>
@@ -148,9 +148,9 @@ export const AccountingStory = () => {
         </div>
 
         <div className="hidden lg:block relative">
-          <div className="sticky top-20 h-[calc(100vh-5rem)] flex items-center justify-center">
+          <div className="sticky top-20 h-[calc(100vh-5rem)] flex items-start justify-center pt-14">
             <div className="w-full max-w-[330px]">
-              <div className="mb-5 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.24em] text-white/35">
+              <div className="mb-4 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.24em] text-white/35">
                 <span>{language === 'tr' ? 'Canlı sistem' : 'Live system'}</span>
                 <span className={copy[activeStep].accent}>{copy[activeStep].index}</span>
               </div>
