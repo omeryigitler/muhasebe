@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { APP_CONFIG } from '../config';
 import { useLanguage } from '../context/LanguageContext';
 import { cn } from '../utils/cn';
+import { Magnetic } from './Magnetic';
 
 const SECTION_IDS = ['services', 'tools', 'process', 'contact'] as const;
 type SectionId = typeof SECTION_IDS[number];
@@ -258,12 +259,14 @@ export const Header = () => {
                 ))}
               </div>
 
-              <a
-                href="#contact"
-                className="inline-flex h-10 items-center rounded-full bg-electric-blue border border-acid-lime px-5 font-mono text-[11px] uppercase tracking-[0.14em] text-white shadow-[4px_4px_0_#D9FF43] transition-[transform,box-shadow,background-color] duration-300 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_#D9FF43] active:translate-x-0 active:translate-y-[1px] active:shadow-[2px_2px_0_#D9FF43]"
-              >
-                {t('nav.talk')}
-              </a>
+              <Magnetic strength={0.44} radius={82} maxOffset={18}>
+                <a
+                  href="#contact"
+                  className="inline-flex h-10 items-center rounded-full bg-electric-blue border border-acid-lime px-5 font-mono text-[11px] uppercase tracking-[0.14em] text-white shadow-[4px_4px_0_#D9FF43] transition-[transform,box-shadow,background-color] duration-300 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_#D9FF43] active:translate-x-0 active:translate-y-[1px] active:shadow-[2px_2px_0_#D9FF43]"
+                >
+                  {t('nav.talk')}
+                </a>
+              </Magnetic>
             </div>
 
             <div className="md:hidden justify-self-end flex items-center gap-2">
