@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { APP_CONFIG } from '../config';
 import { useLanguage } from '../context/LanguageContext';
+import { Magnetic } from './Magnetic';
 
 export const Contact = () => {
   const { t, language } = useLanguage();
@@ -75,12 +76,14 @@ export const Contact = () => {
             <textarea id="contact-message" required rows={5} value={message} onChange={(event) => setMessage(event.target.value)} className={messageInput} />
           </div>
 
-          <button
-            type="submit"
-            className="w-full bg-electric-blue text-white py-4 rounded-xl font-bold border-2 border-transparent transition-[transform,box-shadow,border-color,background-color] duration-300 ease-out uppercase tracking-widest mt-4 hover:-translate-x-1 hover:-translate-y-1 hover:border-[#FF90E8] hover:shadow-[7px_7px_0_#FF90E8] focus-visible:-translate-x-1 focus-visible:-translate-y-1 focus-visible:border-[#FF90E8] focus-visible:shadow-[7px_7px_0_#FF90E8] active:translate-x-0 active:translate-y-[2px] active:shadow-[3px_3px_0_#FF90E8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF90E8] focus-visible:ring-offset-4 focus-visible:ring-offset-deep-ink"
-          >
-            {copy.submit}
-          </button>
+          <Magnetic className="block w-full" strength={0.32} radius={88} maxOffset={18}>
+            <button
+              type="submit"
+              className="w-full bg-electric-blue text-white py-4 rounded-xl font-bold border-2 border-transparent transition-[transform,box-shadow,border-color,background-color] duration-300 ease-out uppercase tracking-widest mt-4 hover:-translate-x-1 hover:-translate-y-1 hover:border-[#FF90E8] hover:shadow-[7px_7px_0_#FF90E8] focus-visible:-translate-x-1 focus-visible:-translate-y-1 focus-visible:border-[#FF90E8] focus-visible:shadow-[7px_7px_0_#FF90E8] active:translate-x-0 active:translate-y-[2px] active:shadow-[3px_3px_0_#FF90E8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF90E8] focus-visible:ring-offset-4 focus-visible:ring-offset-deep-ink"
+            >
+              {copy.submit}
+            </button>
+          </Magnetic>
           <p id="contact-form-note" className="font-mono text-[10px] leading-relaxed text-white/35">
             {copy.note}
           </p>
