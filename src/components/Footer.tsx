@@ -18,11 +18,11 @@ export const Footer = () => {
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) setIsVisible(true);
+        setIsVisible(entry.isIntersecting);
       },
       {
-        threshold: 0.14,
-        rootMargin: '0px 0px -4% 0px',
+        threshold: 0.28,
+        rootMargin: '0px 0px -6% 0px',
       }
     );
 
@@ -51,46 +51,49 @@ export const Footer = () => {
         </div>
 
         <div
-          className="justify-self-center flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.045] p-1.5"
+          className={cn(
+            'justify-self-center flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.045] p-1.5 transition-[opacity,transform] duration-700 ease-[cubic-bezier(.2,.9,.25,1.15)]',
+            revealed ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-14 scale-95 pointer-events-none'
+          )}
           aria-label={language === 'tr' ? 'Sosyal medya' : 'Social media'}
         >
           {socials.map((social, index) => {
             const Icon = social.icon;
-            const sharedClass = cn(
-              'w-10 h-10 rounded-full flex items-center justify-center text-white/68 transition-[background-color,color,transform,opacity] duration-700 ease-[cubic-bezier(.2,.9,.25,1.2)]',
-              social.href ? `${social.hover} hover:-translate-y-0.5` : 'opacity-65',
+            const delay = reduceMotion ? 0 : 100 + index * 105;
+            const itemRevealClass = cn(
+              'transition-[opacity,transform] duration-700 ease-[cubic-bezier(.2,.9,.25,1.2)]',
               revealed ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-10 scale-75'
             );
-            const delay = reduceMotion ? 0 : 90 + index * 110;
-
-            if (social.href) {
-              return (
-                <Magnetic key={social.key} strength={0.42} radius={54} maxOffset={14}>
-                  <a
-                    href={social.href}
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label={social.label}
-                    className={sharedClass}
-                    style={{ transitionDelay: `${delay}ms` }}
-                  >
-                    <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
-                  </a>
-                </Magnetic>
-              );
-            }
+            const iconClass = cn(
+              'w-10 h-10 rounded-full flex items-center justify-center text-white/68 transition-[background-color,color,transform] duration-300',
+              social.href ? `${social.hover} hover:-translate-y-0.5 cursor-pointer` : 'opacity-65 cursor-default'
+            );
 
             return (
-              <span
-                key={social.key}
-                role="img"
-                aria-label={`${social.label} — ${socialCopy}`}
-                title={`${social.label} — ${socialCopy}`}
-                className={sharedClass}
-                style={{ transitionDelay: `${delay}ms` }}
-              >
-                <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
-              </span>
+              <div key={social.key} className={itemRevealClass} style={{ transitionDelay: `${delay}ms` }}>
+                {social.href ? (
+                  <Magnetic>
+                    <a
+                      href={social.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={social.label}
+                      className={iconClass}
+                    >
+                      <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
+                    </a>
+                  </Magnetic>
+                ) : (
+                  <span
+                    role="img"
+                    aria-label={`${social.label} — ${socialCopy}`}
+                    title={`${social.label} — ${socialCopy}`}
+                    className={iconClass}
+                  >
+                    <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
+                  </span>
+                )}
+              </div>
             );
           })}
         </div>
