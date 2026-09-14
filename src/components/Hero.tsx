@@ -238,7 +238,7 @@ export const Hero = () => {
             ))}
           </div>
 
-          <div className="order-1 lg:order-2 flex justify-center lg:justify-end perspective-1000 px-2 lg:pl-4 lg:pr-8">
+          <div className="order-1 lg:order-2 flex justify-center lg:justify-end perspective-1000 px-2 -translate-y-[10%] sm:translate-y-0 lg:pl-4 lg:pr-8">
             <div ref={calcWrapperRef} className="w-full max-w-[225px] sm:max-w-[285px] lg:max-w-[320px] will-change-transform">
               <Calculator ref={calcRef} isInteractive={isInteractive} onInteract={takeControl} />
               <div className="mt-2 sm:mt-4 flex items-center justify-center gap-2 sm:gap-3 font-mono text-[8px] sm:text-[10px] uppercase tracking-[0.18em] sm:tracking-[0.22em] text-white/30">
