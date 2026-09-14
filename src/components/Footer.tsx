@@ -4,6 +4,7 @@ import { useReducedMotion } from 'motion/react';
 import { APP_CONFIG } from '../config';
 import { useLanguage } from '../context/LanguageContext';
 import { cn } from '../utils/cn';
+import { Magnetic } from './Magnetic';
 
 export const Footer = () => {
   const { t, language } = useLanguage();
@@ -19,7 +20,10 @@ export const Footer = () => {
       ([entry]) => {
         if (entry.isIntersecting) setIsVisible(true);
       },
-      { threshold: 0.2 }
+      {
+        threshold: 0.14,
+        rootMargin: '0px 0px -4% 0px',
+      }
     );
 
     observer.observe(footer);
@@ -47,39 +51,42 @@ export const Footer = () => {
         </div>
 
         <div
-          className={cn(
-            'justify-self-center flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.045] p-1.5 transition-[opacity,transform] duration-700 ease-out',
-            revealed ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-5 scale-95'
-          )}
+          className="justify-self-center flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.045] p-1.5"
           aria-label={language === 'tr' ? 'Sosyal medya' : 'Social media'}
         >
           {socials.map((social, index) => {
             const Icon = social.icon;
             const sharedClass = cn(
-              'w-10 h-10 rounded-full flex items-center justify-center text-white/68 transition-[background-color,color,transform,opacity] duration-300',
-              social.href ? `${social.hover} hover:-translate-y-0.5` : 'opacity-65'
+              'w-10 h-10 rounded-full flex items-center justify-center text-white/68 transition-[background-color,color,transform,opacity] duration-700 ease-[cubic-bezier(.2,.9,.25,1.2)]',
+              social.href ? `${social.hover} hover:-translate-y-0.5` : 'opacity-65',
+              revealed ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-10 scale-75'
             );
-            const delay = reduceMotion ? 0 : 120 + index * 90;
+            const delay = reduceMotion ? 0 : 90 + index * 110;
 
-            return social.href ? (
-              <a
-                key={social.key}
-                href={social.href}
-                target="_blank"
-                rel="noreferrer"
-                aria-label={social.label}
-                className={cn(sharedClass, revealed ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2')}
-                style={{ transitionDelay: `${delay}ms` }}
-              >
-                <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
-              </a>
-            ) : (
+            if (social.href) {
+              return (
+                <Magnetic key={social.key} strength={0.42} radius={54} maxOffset={14}>
+                  <a
+                    href={social.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={social.label}
+                    className={sharedClass}
+                    style={{ transitionDelay: `${delay}ms` }}
+                  >
+                    <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
+                  </a>
+                </Magnetic>
+              );
+            }
+
+            return (
               <span
                 key={social.key}
                 role="img"
                 aria-label={`${social.label} — ${socialCopy}`}
                 title={`${social.label} — ${socialCopy}`}
-                className={cn(sharedClass, revealed ? 'opacity-65 translate-y-0' : 'opacity-0 translate-y-2')}
+                className={sharedClass}
                 style={{ transitionDelay: `${delay}ms` }}
               >
                 <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
