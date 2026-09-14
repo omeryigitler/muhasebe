@@ -6,6 +6,7 @@ import React, { useEffect } from 'react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
+import { AccountingStory } from './components/AccountingStory';
 import { Services } from './components/Services';
 import { KineticMarquee } from './components/KineticMarquee';
 import { Simulator } from './components/Simulator';
@@ -52,6 +53,7 @@ export default function App() {
         <Header />
         <main id="site-content">
           <Hero />
+          <AccountingStory />
           <Services />
           <KineticMarquee />
           <Simulator />
